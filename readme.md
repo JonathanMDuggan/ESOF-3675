@@ -1,3 +1,3 @@
 # Database System Project
 
-This is here temporarily for now 
+This is here temporarily
