@@ -14,4 +14,4 @@ class SpotifyAPI:
         return
     
     def get_artist(artist_name : str):
-        
+        pass

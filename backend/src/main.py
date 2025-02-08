@@ -37,7 +37,7 @@ def load_api(API_CLIENT_ID_NAME: str, API_CLIENT_SECERT_NAME: str, URL: str):
 
     headers = {
         "Authorization": "Basic " + AUTH_BYTES64,
-        "Content-Type:": "application/x-www-form-urlencoded"
+        "Content-Type": "application/x-www-form-urlencoded"
     }
 
     data = {"grant_type": "client_credentials"}
