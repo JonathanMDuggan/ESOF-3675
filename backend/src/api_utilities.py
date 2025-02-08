@@ -13,7 +13,8 @@ def load_api(API_CLIENT_ID_NAME: str, API_CLIENT_SECRET_NAME: str, URL: str):
         logging.error("%s is: %s", API_CLIENT_SECRET_NAME, CLIENT_SECRET)
         return None
     else:
-        logging.info("Successfully loaded %s and %s", API_CLIENT_ID_NAME, API_CLIENT_SECRET_NAME)
+        logging.info("Successfully loaded %s and %s", 
+                     API_CLIENT_ID_NAME, API_CLIENT_SECRET_NAME)
 
     AUTH_STRING = CLIENT_ID + ":" + CLIENT_SECRET
     AUTH_BYTES = AUTH_STRING.encode("utf-8")
