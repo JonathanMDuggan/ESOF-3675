@@ -1,5 +1,5 @@
 import os
-from spotify_func import SpotifyAPIInterface
+from spotify_func import SpotifyAPIFacade
 from flask import Flask, render_template, request, jsonify
 import logging
 from requests import post
@@ -16,8 +16,9 @@ def name():
 
 def main():
     # Set the logging level to its lowest level
-    spotify_api = SpotifyAPIInterface("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECERT")
+    spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
     spotify_api.get_artist_by_name("ACDC")
+    spotify_api.get_artist_list_by_name("eminem", 5)
     logging.root.setLevel(logging.NOTSET)
     logging.info("Starting Python FLask")
     # load the spotify api
