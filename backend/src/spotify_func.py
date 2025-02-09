@@ -25,41 +25,11 @@ class SpotifyAPIFacade:
     # For information about the search functionality you can read more here
     # https://developer.spotify.com/documentation/web-api/reference/search
 
-    # Uses the search functionality to find the most popular artist by name    
-    def get_artist_by_name(self, artist_name : str):
-        QUERY = f'?q={artist_name}&type=artist&limit=1'
-        self.print_json_from_query(QUERY)
 
-    # Uses the search functionality to find the related artists by name
-    def get_artist_list_by_name(self, artist_name: str, number: int):
-       if number <= 0:
-           logging.warning("We cannot create a list less than or equal to 0")
-           return
-       QUERY = f'?q={artist_name}&type=artist&limit={number}'
-       self.print_json_from_query(QUERY)
-    
-    # Uses the search functionality to find the most popular album by name
-    def get_album_by_name(self, album_name : str):
-        QUERY = f'?q={album_name}&type=album&limit=1'
+    # Uses the search functionality to find the related types by name  
+    def get_type_by_name(self, type : str, type_name: str, limit=1):
+        if limit <= 0:
+            logging.error("The limit cannot be less than 1")
+        QUERY = f'?q={type_name}&type={type}&limit={limit}'
         self.print_json_from_query(QUERY)
-
-    # Uses the search functionality to find the related albums by name
-    def get_album_list_by_name(self, album_name : str, number: int):
-        if number <= 0:
-           logging.warning("We cannot create a list less than or equal to 0")
-           return
-        QUERY = f'?q={album_name}&type=album&limit={number}'
-        self.print_json_from_query(QUERY)
-
-    # Uses the search functionality to find the most popular track by name
-    def get_track_by_name(self, track_name : str):
-        QUERY = f'?q={track_name}&type=track&limit=1'
-        self.print_json_from_query(QUERY)
-
-    # Uses the search functionality to find the most popular track by name
-    def get_track_list_by_name(self, track_name : str, number: int):
-        if number <= 0:
-           logging.warning("We cannot create a list less than or equal to 0")
-           return
-        QUERY = f'?q={track_name}&type=track&limit={number}'
-        self.print_json_from_query(QUERY)
+  

@@ -17,8 +17,8 @@ def name():
 def main():
     # Set the logging level to its lowest level
     spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
-    spotify_api.get_artist_by_name("ACDC")
-    spotify_api.get_artist_list_by_name("eminem", 5)
+    spotify_api.get_type_by_name("artist", "ACDC")
+    spotify_api.get_type_by_name("artist","eminem", 5)
     logging.root.setLevel(logging.NOTSET)
     logging.info("Starting Python FLask")
     # load the spotify api
