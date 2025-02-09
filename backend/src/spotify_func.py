@@ -39,3 +39,6 @@ class SpotifyAPIFacade:
             return
         QUERY = f'?q={type_name}&type={type}&limit={limit}'
         self.print_json_from_query(QUERY)
+
+    def get_artists_top_tracks(id: str):
+        pass
