@@ -7,7 +7,8 @@ from requests import get, post, exceptions
 class SpotifyAPIFacade:
     def __init__(self, API_CLIENT_ID_NAME, API_CLIENT_SECRET_NAME):
         self.URL_SEARCH = "https://api.spotify.com/v1/search"
-        self.search_types = ["album", "artist", "playlist", "track", "show", "episode", "audiobook"]
+        self.search_types = ["album", "artist", "playlist", "track", 
+                            "show", "episode", "audiobook"]
         load_dotenv()
         self.token = connect_spotify_api(API_CLIENT_ID_NAME, API_CLIENT_SECRET_NAME,
                  "https://accounts.spotify.com/api/token" )
