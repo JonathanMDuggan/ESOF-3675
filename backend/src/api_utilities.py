@@ -4,7 +4,7 @@ import logging
 import base64
 from requests import post
 # Load the api from the .env file
-def load_api(API_CLIENT_ID_NAME: str, API_CLIENT_SECRET_NAME: str, URL: str):
+def connect_spotify_api(API_CLIENT_ID_NAME: str, API_CLIENT_SECRET_NAME: str, URL: str):
     CLIENT_ID     = os.getenv(API_CLIENT_ID_NAME)
     CLIENT_SECRET = os.getenv(API_CLIENT_SECRET_NAME)
 
