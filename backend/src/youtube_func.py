@@ -17,3 +17,22 @@ class GoogleAPIFacade:
        
     def get_youtube(self):
         return self.youtube
+    
+    def search_for_video(self, query: str, limit=1, order='relevance'):
+        request = self.youtube.search().list(
+            part='snippet',
+            q=query,
+            type='video',
+            maxResults=limit,
+            order=order
+        )
+        response = request.execute()
+        return response
+    
+    def get_video_statistics(self, video_id: str):
+        request = self.youtube.videos().list(
+            part='statistics',
+            id=video_id
+        )
+        response = request.execute()
+        return response
