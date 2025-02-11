@@ -21,10 +21,15 @@ def name():
     return 'You typed home in the funny thing <home>'
 
 def main():
-    OutlierExample()
-    logging.root.setLevel(logging.NOTSET)
-    logging.info("Starting Python FLask")
-    app.run(debug=True)
+    #OutlierExample()
+    spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
+    tracks = spotify_api.get_artist_album_tracks(
+        spotify_api.name_to_id_adapter("artist","eminem"))
+    
+    print(json.dumps(tracks, indent=4))
+    #logging.root.setLevel(logging.NOTSET)
+    #logging.info("Starting Python FLask")
+    #app.run(debug=True)
 
 if __name__ == '__main__':
     main()
