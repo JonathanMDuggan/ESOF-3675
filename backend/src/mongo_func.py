@@ -11,7 +11,8 @@ class MongoDBFacade:
         load_dotenv()
         self.CONNECTION_STRING = os.getenv(CONNECTION_STRING_NAME)
         if self.CONNECTION_STRING == None:
-            logging.error("%s is: %s", CONNECTION_STRING_NAME, self.CONNECTION_STRING)
+            logging.error("%s is: %s", CONNECTION_STRING_NAME, 
+                          self.CONNECTION_STRING)
             return None
         else:
             logging.info("Successfully loaded %s and %s", 

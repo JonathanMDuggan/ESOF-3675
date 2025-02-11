@@ -13,7 +13,8 @@ class SpotifyAPIFacade:
         self.search_types = ["album", "artist", "playlist", "track", 
                             "show", "episode", "audiobook"]
         load_dotenv()
-        self.token = connect_spotify_api(API_CLIENT_ID_NAME, API_CLIENT_SECRET_NAME,
+        self.token = connect_spotify_api(API_CLIENT_ID_NAME,
+                                         API_CLIENT_SECRET_NAME,
                  "https://accounts.spotify.com/api/token" )
         if self.token is None:
             logging.error("Failed to fetch token from spotify servers")
@@ -67,13 +68,17 @@ class SpotifyAPIFacade:
         """ deprecated API endpoint """
         QUERY = "recommendations/available-genre-seeds"
         QUERY_URL = f'{self.BASE_URL}/{QUERY}'
-        genres = ["alternative","samba", "rock", "pop", "rap", "jazz", "hip-hop", "country", "blues", "classical", "dance", "disco", "electronic", "folk"]
+        genres = ["alternative","samba", "rock", "pop", "rap", "jazz",
+                  "hip-hop", "country", "blues", "classical", "dance",
+                  "disco", "electronic", "folk"]
         genres = random.sample(genres, 5)
         return genres
     
-    def get_recommendations(self, seed_artists: list, seed_genres: list, seed_tracks: list):
+    def get_recommendations(self, seed_artists: list, 
+                            seed_genres: list, seed_tracks: list):
         """ deprecated API endpoint """
-        return self.search_for_item("track", f'{seed_genres[0]} {seed_genres[1]}', 50)
+        return self.search_for_item("track", f'{seed_genres[0]} 
+                                    {seed_genres[1]}', 50)
     
 
     def get_several_artists(self, artist_ids: list):
