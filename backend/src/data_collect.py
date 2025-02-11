@@ -46,7 +46,7 @@ def get_data(insert_data=False):
     # Get the ids of the random tracks
     track_ids = [track['id'] for track in random_tracks]
 
-    # Use the track ids from database to excliude the tracks that are already
+    # Use the track ids from database to exclude the tracks that are already
     # in the database
     track_ids = list(set(track_ids) - set(track_ids_database))
 
@@ -114,7 +114,7 @@ def process_data_from_db(data=None):
         albums_df = pd.DataFrame(albums).fillna(value=np.nan)
 
 
-        # Get the shape of the dataframes
+        # Get the shape of the Dataframes
         print("Shape of the tracks dataframe")
         print(tracks_df.shape)
         print("Shape of the artists dataframe")
@@ -122,7 +122,7 @@ def process_data_from_db(data=None):
         print("Shape of the albums dataframe")
         print(albums_df.shape)
 
-        # Get the statistical summary of the dataframes
+        # Get the statistical summary of the Dataframes
         print("Statistical summary of the tracks dataframe")
         print(tracks_df.describe())
         print("Statistical summary of the artists dataframe")
@@ -130,7 +130,7 @@ def process_data_from_db(data=None):
         print("Statistical summary of the albums dataframe")
         print(albums_df.describe())
 
-        # Get the info of the dataframes
+        # Get the info of the Dataframes
         print("Info of the tracks dataframe")
         print(tracks_df.info())
         print("Info of the artists dataframe")

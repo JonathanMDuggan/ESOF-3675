@@ -16,23 +16,14 @@ def OutlierExample():
     # Connect to the spotify api
     spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
     
-    # Search for artist The Weeknd and Gotye 
-    the_weeknd = spotify_api.search_for_item("artist", "The Weeknd", limit=1)
-    gotye = spotify_api.search_for_item("artist", "Gotye", limit=1)
-    
-    # Store the top artist ID from the search result
-    the_weeknd_id = []
-    the_weeknd_id = list(map(lambda x: {
-        "name": x['name'], 
-        "id": x['id']}, the_weeknd))
-    gotye_id = []
-    gotye_id = list(map(lambda x: {
-        "name": x['name'],
-        "id": x['id']}, gotye))
-    
+
     # Pass the artist ID to the get_artist_top_tracks function
-    the_weeknd_tracks = spotify_api.get_artist_top_tracks(the_weeknd_id[0]['id'])
-    gotye_tracks = spotify_api.get_artist_top_tracks(gotye_id[0]['id'])
+    the_weeknd_tracks = spotify_api.get_artist_top_tracks(
+        spotify_api.name_to_id_adapter("artist", "The Weeknd")
+    )
+    gotye_tracks = spotify_api.get_artist_top_tracks(
+        spotify_api.name_to_id_adapter("artist", "Gotye")
+    )
 
     # Store the top songs in a list with name and popularity as the dimensions 
     the_weeknd_track_names_and_pop = list(map(lambda x: {
