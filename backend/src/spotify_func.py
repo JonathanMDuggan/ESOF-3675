@@ -1,3 +1,4 @@
+import random
 from api_utilities import connect_spotify_api
 import logging
 import json
@@ -60,3 +61,41 @@ class SpotifyAPIFacade:
         QUERY = f'{artist_id}/top-tracks'
         result = self.print_json_from_query("artists", QUERY)
         return result
+    
+
+    def get_available_genre_seeds(self):
+        """ deprecated API endpoint """
+        QUERY = "recommendations/available-genre-seeds"
+        QUERY_URL = f'{self.BASE_URL}/{QUERY}'
+        genres = ["alternative","samba", "rock", "pop", "rap", "jazz", "hip-hop", "country", "blues", "classical", "dance", "disco", "electronic", "folk"]
+        genres = random.sample(genres, 5)
+        return genres
+    
+    def get_recommendations(self, seed_artists: list, seed_genres: list, seed_tracks: list):
+        """ deprecated API endpoint """
+        return self.search_for_item("track", f'{seed_genres[0]} {seed_genres[1]}', 50)
+    
+
+    def get_several_artists(self, artist_ids: list):
+        if artist_ids == None:
+            logging.error("Artist IDs cannot be None")
+            return
+        QUERY = f'?ids={",".join(artist_ids)}'
+        result = self.print_json_from_query("artists", QUERY)
+        return result['artists']
+    
+    def get_several_tracks(self, track_ids: list):
+        if track_ids == None:
+            logging.error("Track IDs cannot be None")
+            return
+        QUERY = f'?ids={",".join(track_ids)}'
+        result = self.print_json_from_query("tracks", QUERY)
+        return result['tracks']
+    
+    def get_several_albums(self, album_ids: list):
+        if album_ids == None:
+            logging.error("Album IDs cannot be None")
+            return
+        QUERY = f'?ids={",".join(album_ids)}'
+        result = self.print_json_from_query("albums", QUERY)
+        return result['albums']
