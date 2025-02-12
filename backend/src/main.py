@@ -65,18 +65,18 @@ def main():
     # PROGRAM STARTS HERE
 
     # Load the data from the data sources into the database
-    data = get_data()
+    # data = get_data()
 
     #Printing the data retrieved from the data sources
-    print("Tracks")
-    print(json.dumps(data['tracks'], indent=4))
-    print("Artists")
-    print(json.dumps(data['artists'], indent=4))
-    print("Albums")
-    print(json.dumps(data['albums'], indent=4))
+    # print("Tracks")
+    # print(json.dumps(data['tracks'], indent=4))
+    # print("Artists")
+    # print(json.dumps(data['artists'], indent=4))
+    # print("Albums")
+    # print(json.dumps(data['albums'], indent=4))
 
     # Print out stats for the data
-    process_data_from_db(data)
+    process_data_from_db() #(data)
 
 
 
