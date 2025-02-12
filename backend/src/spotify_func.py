@@ -13,7 +13,8 @@ class SpotifyAPIFacade:
         self.search_types = ["album", "artist", "playlist", "track", 
                             "show", "episode", "audiobook"]
         load_dotenv()
-        self.token = connect_spotify_api(API_CLIENT_ID_NAME, API_CLIENT_SECRET_NAME,
+        self.token = connect_spotify_api(API_CLIENT_ID_NAME,
+                                         API_CLIENT_SECRET_NAME,
                  "https://accounts.spotify.com/api/token" )
         if self.token is None:
             logging.error("Failed to fetch token from spotify servers")
@@ -21,7 +22,7 @@ class SpotifyAPIFacade:
             self.auth_header = {"Authorization": "Bearer " + self.token}
         return
     
-    def print_json_from_query(self, endpoint: str, QUERY: str):
+    def json_from_query(self, endpoint: str, QUERY: str):
        QUERY_URL = f'{self.BASE_URL}/{endpoint}/{QUERY}'
        try:
            response = get(QUERY_URL, headers=self.auth_header)
@@ -42,16 +43,20 @@ class SpotifyAPIFacade:
             logging.error("The limit cannot be less than 1")
             return
         QUERY = f'?q={type_name}&type={type}&limit={limit}'
-        result = self.print_json_from_query("search", QUERY)
+        result = self.json_from_query("search", QUERY)
         return result[f'{type}s']['items']
-
+    
+    # Returns the most popular type id from type name 
+    def name_to_id_adapter(self, type: str, type_name: str) -> str:
+        result = self.search_for_item(type, type_name)
+        return result[0]['id']
 
     def get_track(self, track_id):
         if track_id == None:
             logging.error("Track ID cannot be None")
             return
         QUERY = f'{track_id}'
-        result = self.print_json_from_query("tracks", QUERY)
+        result = self.json_from_query("tracks", QUERY)
         return result
     
     def get_artist_top_tracks(self, artist_id):
@@ -59,29 +64,31 @@ class SpotifyAPIFacade:
             logging.error("Artist ID cannot be None")
             return
         QUERY = f'{artist_id}/top-tracks'
-        result = self.print_json_from_query("artists", QUERY)
+        result = self.json_from_query("artists", QUERY)
         return result
     
-
     def get_available_genre_seeds(self):
         """ deprecated API endpoint """
         QUERY = "recommendations/available-genre-seeds"
         QUERY_URL = f'{self.BASE_URL}/{QUERY}'
-        genres = ["alternative","samba", "rock", "pop", "rap", "jazz", "hip-hop", "country", "blues", "classical", "dance", "disco", "electronic", "folk"]
+        genres = ["alternative","samba", "rock", "pop", "rap", "jazz",
+                  "hip-hop", "country", "blues", "classical", "dance",
+                  "disco", "electronic", "folk"]
         genres = random.sample(genres, 5)
         return genres
     
-    def get_recommendations(self, seed_artists: list, seed_genres: list, seed_tracks: list):
+    def get_recommendations(self, seed_artists: list, 
+                            seed_genres: list, seed_tracks: list):
         """ deprecated API endpoint """
-        return self.search_for_item("track", f'{seed_genres[0]} {seed_genres[1]}', 50)
+        return self.search_for_item("track", f'{seed_genres[0]}{seed_genres[1]}'
+                                    ,50)
     
-
     def get_several_artists(self, artist_ids: list):
         if artist_ids == None:
             logging.error("Artist IDs cannot be None")
             return
         QUERY = f'?ids={",".join(artist_ids)}'
-        result = self.print_json_from_query("artists", QUERY)
+        result = self.json_from_query("artists", QUERY)
         return result['artists']
     
     def get_several_tracks(self, track_ids: list):
@@ -89,7 +96,7 @@ class SpotifyAPIFacade:
             logging.error("Track IDs cannot be None")
             return
         QUERY = f'?ids={",".join(track_ids)}'
-        result = self.print_json_from_query("tracks", QUERY)
+        result = self.json_from_query("tracks", QUERY)
         return result['tracks']
     
     def get_several_albums(self, album_ids: list):
@@ -97,5 +104,42 @@ class SpotifyAPIFacade:
             logging.error("Album IDs cannot be None")
             return
         QUERY = f'?ids={",".join(album_ids)}'
-        result = self.print_json_from_query("albums", QUERY)
+        result = self.json_from_query("albums", QUERY)
         return result['albums']
+    
+    def get_artist_albums(self, artist_id: str, limit=20):
+        if artist_id == None:
+            logging.error("Artist ID cannot be None")
+            return
+        if 1 <= limit <= 50:
+            QUERY = f'{artist_id}/albums?limit={limit}'
+        else:
+            logging.error("The limit must be between 1 and 50")
+            return
+        result = self.json_from_query("artists", QUERY)
+        return result['items']
+
+    def get_album_tracks(self, album_id: str, limit=20):
+        if album_id == None:
+            logging.error("Album ID cannot be None")
+            return
+        if 1 <= limit <= 50:
+            QUERY = f'{album_id}/tracks?limit={limit}'
+        else:
+            logging.error("The limit must be between 1 and 50")
+            return
+        result = self.json_from_query("albums", QUERY)
+        return result['items']
+
+    def get_artist_album_tracks(self, artist_id: str, album_limit=20,
+                                track_limit=20):
+        if artist_id == None:
+            logging.error("Artist IDs cannot be None")
+            return
+        albums = self.get_artist_albums(artist_id, album_limit)
+        if albums == None:
+            return
+        tracks = []
+        for album in albums:
+            tracks.append(self.get_album_tracks(album['id'], track_limit))
+        return tracks
