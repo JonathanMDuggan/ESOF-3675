@@ -2,7 +2,8 @@ import os
 
 import numpy as np
 from mongo_func import MongoDBFacade
-from util_func import add_video_stats_to_tracks, extract_album_ids_from_tracks, extract_artist_ids_from_tracks, extract_relavant_album_info_from_details, extract_relavant_artist_info_from_details, extract_relavant_track_info_from_details, extract_relavant_track_info_from_details_youtube, get_artists_details, get_artists_top_tracks
+from reporting import report_stats_for_albums, report_stats_for_artists, report_stats_for_tracks
+from util_func import add_video_stats_to_tracks, extract_album_ids_from_tracks, extract_artist_ids_from_tracks, extract_relavant_album_info_from_details, extract_relavant_artist_info_from_details, extract_relavant_track_info_from_details, extract_relavant_track_info_from_details_2, extract_relavant_track_info_from_details_youtube, get_artists_details, get_artists_top_tracks
 from youtube_func import GoogleAPIFacade
 from spotify_func import SpotifyAPIFacade
 import pymongo
@@ -137,6 +138,12 @@ def process_data_from_db(data=None):
         print(artists_df.info())
         print("Info of the albums dataframe")
         print(albums_df.info())
+
+        # Get the stats for the data
+
+        report_stats_for_tracks(tracks_df)
+        report_stats_for_artists(artists_df)
+        report_stats_for_albums(albums_df)
 
 
 
