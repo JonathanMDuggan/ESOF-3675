@@ -35,17 +35,22 @@ class SpotifyAPIFacade:
     # For information about the search functionality you can read more here
     # https://developer.spotify.com/documentation/web-api/reference/search
     # Uses the search functionality to find the related types by name  
-    def search_for_item(self, type : str, type_name: str, limit=1):
+    def search_for_item(self, type : str, type_name=None, limit=1, q="q"):
         if type not in self.search_types:
             logging.error(f"Type {type} is not a valid parameter")
             return
         if limit <= 0:
             logging.error("The limit cannot be less than 1")
             return
-        QUERY = f'?q={type_name}&type={type}&limit={limit}'
+        if type_name == None:
+            QUERY = f'?q={q}&type={type}&limit={limit}'
+        else:
+            QUERY = f'?q={q}={type_name}&type={type}&limit={limit}'
+        
         result = self.json_from_query("search", QUERY)
         return result[f'{type}s']['items']
     
+
     # Returns the most popular type id from type name 
     def name_to_id_adapter(self, type: str, type_name: str) -> str:
         result = self.search_for_item(type, type_name)

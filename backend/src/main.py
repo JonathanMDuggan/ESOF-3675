@@ -1,5 +1,6 @@
 import os
 # from example_func import OutlierExample
+from example_func import OutlierExample, popularity_example, duration_distribution_example, box_plot, correlation
 from data_collect import get_data, process_data_from_db
 from youtube_func import GoogleAPIFacade
 from spotify_func import SpotifyAPIFacade
@@ -89,6 +90,8 @@ def main():
     #     spotify_api.name_to_id_adapter("artist","eminem"))
     
     # print(json.dumps(tracks, indent=4))
+    box_plot()
+   
     #logging.root.setLevel(logging.NOTSET)
     #logging.info("Starting Python FLask")
     #app.run(debug=True)
