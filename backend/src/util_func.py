@@ -94,7 +94,7 @@ def add_video_stats_to_tracks(tracks: list, google_api: GoogleAPIFacade) -> list
     popularity, and video statistics.
     """
     for track in tracks:
-        response = google_api.search_for_video(track['name'], 1, 'viewCount')
+        response = google_api.search_for_video(f'{track['artists'][0]['name']} - {track['name']}', 1, 'relevance')
         if response:
             video_id = response['items'][0]['id']['videoId']
             video_name = response['items'][0]['snippet']['title']

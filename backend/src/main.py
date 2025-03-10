@@ -1,5 +1,5 @@
 import os
-from example_func import OutlierExample
+# from example_func import OutlierExample
 from data_collect import get_data, process_data_from_db
 from youtube_func import GoogleAPIFacade
 from spotify_func import SpotifyAPIFacade
@@ -69,15 +69,9 @@ def main():
     # PROGRAM STARTS HERE
 
     # Load the data from the data sources into the database
-    # data = get_data()
+    # data = get_data(True)
 
-    #Printing the data retrieved from the data sources
-    # print("Tracks")
-    # print(json.dumps(data['tracks'], indent=4))
-    # print("Artists")
-    # print(json.dumps(data['artists'], indent=4))
-    # print("Albums")
-    # print(json.dumps(data['albums'], indent=4))
+
 
     # Print out stats for the data
     process_data_from_db() #(data)
@@ -90,11 +84,11 @@ def main():
     # load the spotify api
     app.run(debug=True)
     #OutlierExample()
-    spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
-    tracks = spotify_api.get_artist_album_tracks(
-        spotify_api.name_to_id_adapter("artist","eminem"))
+    # spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
+    # tracks = spotify_api.get_artist_album_tracks(
+    #     spotify_api.name_to_id_adapter("artist","eminem"))
     
-    print(json.dumps(tracks, indent=4))
+    # print(json.dumps(tracks, indent=4))
     #logging.root.setLevel(logging.NOTSET)
     #logging.info("Starting Python FLask")
     #app.run(debug=True)
