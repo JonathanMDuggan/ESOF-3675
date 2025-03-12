@@ -70,12 +70,12 @@ def main():
     # PROGRAM STARTS HERE
 
     # Load the data from the data sources into the database
-    # data = get_data(True)
+    data = get_data(True)
 
 
 
     # Print out stats for the data
-    process_data_from_db() #(data)
+    process_data_from_db(data)
 
 
 
@@ -90,7 +90,7 @@ def main():
     #     spotify_api.name_to_id_adapter("artist","eminem"))
     
     # print(json.dumps(tracks, indent=4))
-    box_plot()
+    # box_plot()
    
     #logging.root.setLevel(logging.NOTSET)
     #logging.info("Starting Python FLask")
