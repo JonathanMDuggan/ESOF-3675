@@ -77,7 +77,7 @@ def popularity_example():
     rap_panda = pd.DataFrame(rap_list)
     vapor_panda  = pd.DataFrame(vapor_wave_list)
 
-        # Create the Horizontal Bar Graphs
+    # Create the Horizontal Bar Graphs
     fig, ax = plt.subplots()
     ax.barh(rap_panda['name'], rap_panda['popularity'])
     ax.set_ylabel('popularity')
@@ -174,5 +174,38 @@ def correlation():
     plt.xlabel(f"Popularity")
     plt.show()
 
+
+def correlation_youtube():
+    spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
+    youtube_api = GoogleAPIFacade("YOUTUBE_API_KEY")
+    rappers = spotify_api.search_for_item("track", None , 50, "genre%3Arap")
+    rap_tracks = list(map(lambda x: {
+        "name" : x['name'], 
+        "popularity" : x['popularity'],
+        "artist" : x['artists'][0]['name']},
+        rappers))
+    
+    youtube_videos = []
+    youtube_views = []
+    for track in rap_tracks:
+        youtube_videos.append(youtube_api.search_for_video(track['artist'] + " - " + track['name'] , 1))
+        youtube_views.append(youtube_api.get_video_statistics(youtube_videos[-1]['items'][0]['id']['videoId']))
+    
+    youtube_views = list(map(lambda x: x['items'][0]['statistics']['viewCount'], youtube_views))
+    youtube_views = pd.DataFrame(youtube_views)
+    rap_tracks = pd.DataFrame(rap_tracks)
+    rap_tracks['youtube_views'] = youtube_views
+    rap_tracks = rap_tracks.to_numpy()
+    x = rap_tracks[:,1]
+    y = rap_tracks[:,3]
+    plt.scatter(y, x)
+    plt.plot(np.unique(x), np.poly1d(np.polyfit(x, y, 1))
+         (np.unique(x)), color='red')
+    plt.title("Scatter Plot of Popularity and Youtube Views for Rappers")
+    plt.ylabel(f"Youtube Views")
+    plt.xlabel(f"Popularity")
+    plt.show()
+
+    
 
 

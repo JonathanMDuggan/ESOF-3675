@@ -4,6 +4,7 @@ import json
 from dotenv import load_dotenv
 from requests import get, post, exceptions
 from googleapiclient.discovery import build
+from ytmusicapi import YTMusic
 import os
 
 class GoogleAPIFacade:
@@ -14,6 +15,7 @@ class GoogleAPIFacade:
             logging.error(f"Could not retrieve {API_CLIENT_ID_NAME} "
                            "from .env file")
         self.youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+        self.ytmusic = YTMusic()
        
     def get_youtube(self):
         return self.youtube
@@ -36,3 +38,7 @@ class GoogleAPIFacade:
         )
         response = request.execute()
         return response
+    
+    def get_ytmusic(self):
+        return self.ytmusic
+    
