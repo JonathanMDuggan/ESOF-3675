@@ -94,7 +94,7 @@ def add_video_stats_to_tracks(tracks: list, google_api: GoogleAPIFacade) -> list
     popularity, and video statistics.
     """
     for track in tracks:
-        response = google_api.search_for_video(track['name'], 1, 'viewCount')
+        response = google_api.search_for_video(f'{track['artists'][0]['name']} - {track['name']}', 1, 'relevance')
         if response:
             video_id = response['items'][0]['id']['videoId']
             video_name = response['items'][0]['snippet']['title']
@@ -104,6 +104,59 @@ def add_video_stats_to_tracks(tracks: list, google_api: GoogleAPIFacade) -> list
             track['statistics'] = response['items'][0]['statistics']
     return tracks
 
+def get_track_ids_to_video_ids_dict(tracks: list, google_api: GoogleAPIFacade) -> dict:
+    """
+    This function takes in a list of tracks and a GoogleAPIFacade object
+    and returns a dictionary containing the track ids as keys and the video
+    ids as values.
+    """ 
+    track_ids_to_video_ids = {}
+    for track in tracks:
+        response = google_api.search_for_video(f'{track["artists"][0]["name"]} - {track["name"]}', 1, 'relevance')
+        if response:
+            video = response['items'][0]
+            track_ids_to_video_ids[track['id']] = video
+    return track_ids_to_video_ids
+
+def get_video_statistics(track_ids_to_video_ids: dict, google_api: GoogleAPIFacade) -> dict:
+    """
+    This function takes in a list of video ids and a GoogleAPIFacade object
+    and returns a dictionary containing the video statistics.
+    """
+    dict_response = {}
+    for track_id in track_ids_to_video_ids.keys():
+        video = track_ids_to_video_ids[track_id]
+        print(json.dumps(video, indent=4))
+        response = google_api.get_video_statistics(video['id']['videoId'])
+        if response['items'] is not str and len(response['items']) > 0:
+            video2 = response['items'][0]
+            print(json.dumps(video2, indent=4))
+            snippet = video.get('snippet', None)
+            statistic = video2.get('statistics', None)
+            video_item = {
+                "music_video_id": video['id']['videoId'],
+                "video_name": snippet is not None and snippet.get('title', None),
+                "view_count": statistic is not None and statistic.get('viewCount', None),
+                "like_count": statistic is not None and statistic.get('likeCount', None),
+                "comment_count": statistic is not None and statistic.get('commentCount', None),
+                "release_date": snippet is not None and snippet.get('publishedAt', None),
+                "track_id": track_id
+            }
+            dict_response[video['id']['videoId']] = video_item
+    return dict_response
+
+# def get_genre_tuple_list_from_artists_details(artist_detail_list: list, genre_dict: dict) -> list:
+#     """
+#     This function takes in a list of artist details and a genre dictionary
+#     and returns a list of tuples containing the artist id and genre id.
+#     """
+#     result = []
+#     for artist in artist_detail_list:
+#         for genre in artist['genres']:
+#             genre_id = genre_dict.get(genre, None)
+#             if genre_id:
+#                 result.append((artist['id'], genre_id))
+#     return result
 
 def extract_relavant_artist_info_from_details(artist_detail_list: list) -> list:
     """
@@ -124,10 +177,15 @@ def extract_relavant_track_info_from_details(track_detail_list: list) -> list:
     list of dictionaries containing the track's name, id, and popularity.
     """
     # print(json.dumps(track_detail_list, indent=4))
-    return [{"name": track['name'],
+    return [{"name": track['name'], 
              "id": track['id'], 
-             "popularity": track['popularity']}
-             for track in track_detail_list]
+             "popularity": track['popularity'],
+             "duration_ms": track['duration_ms'],
+             "release_date": track['album']['release_date'] or "1970-01-01",
+             "release_date_precision": track['album']['release_date_precision'],
+             "explicit": track['explicit'],
+             "track_number": track['track_number'],
+            } for track in track_detail_list]
 
 def extract_relavant_track_info_from_details_youtube(
         track_detail_list: list) -> list:
@@ -166,3 +224,14 @@ def extract_relavant_album_info_from_details(album_detail_list: list) -> list:
              "release_date": album['release_date'],
              "release_date_precision": album['release_date_precision']}
               for album in album_detail_list]
+
+
+def filter_junction_table_data_by_keys_using_db_collection(
+        junction_table_data: list, db_collection: list, attr1: str, attr2: str) -> list:
+    """
+    This function takes in a list of junction table data and a list from db and filters
+    the junction table data by two attributes of the db collection.
+    """
+    # transform db collection into set for faster lookup
+    db_collection_set = set([f"{doc[attr1]}_{doc[attr2]}" for doc in db_collection])
+    return [doc for doc in junction_table_data if f"{doc[attr1]}_{doc[attr2]}" not in db_collection_set]
