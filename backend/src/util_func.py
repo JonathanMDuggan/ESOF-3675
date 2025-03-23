@@ -2,6 +2,7 @@ import json
 
 import numpy as np
 from spotify_func import SpotifyAPIFacade
+from unofficial_youtube_func import UnOfficialYoutubeAPIFacade
 from youtube_func import GoogleAPIFacade
 
 
@@ -104,17 +105,22 @@ def add_video_stats_to_tracks(tracks: list, google_api: GoogleAPIFacade) -> list
             track['statistics'] = response['items'][0]['statistics']
     return tracks
 
-def get_track_ids_to_video_ids_dict(tracks: list, google_api: GoogleAPIFacade) -> dict:
+def get_track_ids_to_video_ids_dict(tracks: list, google_api: GoogleAPIFacade, unofficial_youtube_api: UnOfficialYoutubeAPIFacade, use_unofficial_search: bool = True) -> dict:
     """
     This function takes in a list of tracks and a GoogleAPIFacade object
     and returns a dictionary containing the track ids as keys and the video
     ids as values.
     """ 
+    api = unofficial_youtube_api if use_unofficial_search else google_api
     track_ids_to_video_ids = {}
     for track in tracks:
-        response = google_api.search_for_video(f'{track["artists"][0]["name"]} - {track["name"]}', 1, 'relevance')
+        response = api.search_for_video(f'{track["artists"][0]["name"]} - {track["name"]}', 1, 'relevance')
         if response:
-            video = response['items'][0]
+            if use_unofficial_search:
+                video = response[0]
+                video['id'] = {'videoId': video['videoId']}
+            else:
+                video = response['items'][0]
             track_ids_to_video_ids[track['id']] = video
     return track_ids_to_video_ids
 
@@ -124,13 +130,20 @@ def get_video_statistics(track_ids_to_video_ids: dict, google_api: GoogleAPIFaca
     and returns a dictionary containing the video statistics.
     """
     dict_response = {}
+    vidio_ids = track_ids_to_video_ids.values()
+    vidio_ids = [video['id']['videoId'] for video in vidio_ids]
+    response = google_api.get_video_statistics(vidio_ids)
+    video_id_dict = {}
+    
+    # print(json.dumps(response, indent=4))
+    for video in response['items']:
+        video_id_dict[video['id']] = video
+
     for track_id in track_ids_to_video_ids.keys():
         video = track_ids_to_video_ids[track_id]
-        print(json.dumps(video, indent=4))
-        response = google_api.get_video_statistics(video['id']['videoId'])
         if response['items'] is not str and len(response['items']) > 0:
-            video2 = response['items'][0]
-            print(json.dumps(video2, indent=4))
+            video2 = video_id_dict.get(video['id']['videoId'], None)
+            # print(json.dumps(video2, indent=4))
             snippet = video.get('snippet', None)
             statistic = video2.get('statistics', None)
             video_item = {
@@ -235,3 +248,23 @@ def filter_junction_table_data_by_keys_using_db_collection(
     # transform db collection into set for faster lookup
     db_collection_set = set([f"{doc[attr1]}_{doc[attr2]}" for doc in db_collection])
     return [doc for doc in junction_table_data if f"{doc[attr1]}_{doc[attr2]}" not in db_collection_set]
+
+
+def extract_track_details_from_csv(csvData: list[dict]):
+    """
+    This function takes in a list of dictionaries containing track details
+    and returns a list of dictionaries containing the track's name, id, and
+    popularity.
+    The columns in the csv file are:
+    ["energy","tempo","danceability","playlist_genre","loudness","liveness","valence","track_artist","time_signature","speechiness","track_popularity","track_href","uri","track_album_name","playlist_name","analysis_url","track_id","track_name","track_album_release_date","instrumentalness","track_album_id","mode","key","duration_ms","acousticness","id","playlist_subgenre","type","playlist_id"]
+    """
+    return [{
+        "name": track['name'],
+        "id": track['id'],
+        "popularity": track['track_csv']['track_popularity'],
+        "duration_ms": track['track_csv']['duration_ms'],
+        "release_date": track['track_csv']['track_album_release_date'] or "1970-01-01",
+        "release_date_precision": track['album']['release_date_precision'],
+        "explicit": track['explicit'],
+        "track_number": track['track_number']
+            } for track in csvData]
