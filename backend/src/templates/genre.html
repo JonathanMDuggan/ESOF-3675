@@ -1,13 +1,14 @@
-{% extends "main_navbar.html" %}
+{% extends "main_navbar.html" %} 
 {% block content %}
-{% if input and not input_comparison_1 %}
+{% if inputs[0] and not inputs[1] %}
+<!-- TODO: Rewrite HTML to dynamically render the page based on elements of the inputs list-->
 <div class="container">
     <div class="row">
         <form method="POST">
             {{ form.hidden_tag() }}
             <div class="col-lg-2">
                 {{ form.input.label(class="form-label") }}
-                {{ form.input(class="form-label-lg", placeholder="Enter Text", value=input , id="input-field") }}
+                {{ form.input(class="form-label-lg", placeholder="Enter Text", value=inputs[0] , id="input-field") }}
             </div>
             <div class="col-lg-2">
                 {{ form.input_comparison_1.label(class="form-label-lg") }}
@@ -16,20 +17,23 @@
             <br/>
             {{ form.submit(class="btn btn-secondary") }}
         </form>
+        <br>
+        <div>{{ histogram | safe }}</div>            
+    <br/>
     </div>
 </div>
-{% elif input_comparison_1 and input %}
+{% elif inputs[0] and inputs[1] %}
 <div class="container">
     <div class="row">
         <form method="POST">
             {{ form.hidden_tag() }}
             <div class="col-lg-2">
                 {{ form.input.label(class="form-label") }}
-                {{ form.input(class="form-label-lg", placeholder="Enter Text", value=input, id="input-field") }}
+                {{ form.input(class="form-label-lg", placeholder="Enter Text", value=inputs[0], id="input-field") }}
             </div>
             <div class="col-lg-2">
                 {{ form.input_comparison_1.label(class="form-label-lg") }}
-                {{ form.input_comparison_1(class="form-label-lg", placeholder="Enter Text", value=input_comparison_1, id="input-field") }}
+                {{ form.input_comparison_1(class="form-label-lg", placeholder="Enter Text", value=inputs[1], id="input-field") }}
             </div>
             <div class="col-lg-2">
                 {{ form.input_comparison_2.label(class="form-label-lg") }}
@@ -37,30 +41,37 @@
             </div>
             <br/>
             {{ form.submit(class="btn btn-secondary") }}
+            
         </form>
+        <br>
+            <div>{{ histogram | safe }}</div>            
+        <br/>
     </div>
 </div>
 
-{% elif input_comparison_1 and input_comparison_2 and input %}
+{% elif inputs[0] and inputs[1] and inputs[2] %}
 <div class="container">
     <div class="row">
         <form method="POST">
             {{ form.hidden_tag() }}
             <div class="col-lg-2">
                 {{ form.input.label(class="form-label") }}
-                {{ form.input(class="form-label-lg", placeholder=input, id="input-field") }}
+                {{ form.input(class="form-label-lg", placeholder="Enter Text", value= inputs[0],id="input-field") }}
             </div>
             <div class="col-lg-2">
                 {{ form.input_comparison_1.label(class="form-label-lg") }}
-                {{ form.input_comparison_1(class="form-label-lg", placeholder=input_comparison_1, id="input-field") }}
+                {{ form.input_comparison_1(class="form-label-lg", placeholder="Add Comparison", value= inputs[1], id="input-field") }}
             </div>
             <div class="col-lg-2">
                 {{ form.input_comparison_2.label(class="form-label-lg") }}
-                {{ form.input_comparison_2(class="form-label-lg", placeholder="Add Comparison", id="input-field") }}
+                {{ form.input_comparison_2(class="form-label-lg", placeholder="Add Second Comparison", value=inputs[2], id="input-field") }}
             </div>
             <br/>
             {{ form.submit(class="btn btn-secondary") }}
         </form>
+        <br>
+        <div>{{ histogram | safe }}</div>            
+    <br/>
     </div>
 </div>
 

@@ -2,11 +2,27 @@ from flask import Blueprint, Flask, render_template, request, jsonify
 from flask_bootstrap import Bootstrap 
 from flask_wtf import FlaskForm
 from forms import *
+import base64
+from io import BytesIO
 from spotify_func import *
 import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.express as px
 from mongo_func import *
 import os 
 import csv
+
+# NOTE: 
+# 1. I am using a local csv file since, the mongodb is missing famous artist,
+# which makes testing a pain to do
+# 2. This was programmed horribly since I was ina rush. If I had more time I would
+#   a. Rewrite the logic to dynamically produce the figures and tables (using a for loop)
+#   b. Rewrite the inputs as list instead of discrete variables
+
+
+artist_info_csv = pd.read_csv("temp/CLEANED_featured_Spotify_artist_info.csv")
+
+
 views = Blueprint("views", __name__)    
 @views.route('/')
 def index():
@@ -49,22 +65,43 @@ def artist():
 
 @views.route('/genre', methods=['GET', 'POST'])
 def genre():
+    print("GENRE: !!!")
+    fig_html = None
+    comparisons = []
     genres = [None] * 4
     genres[0], genres[1], genres[2], genres[3], form = read_input(InputForm)
-    tracks = None
     genre_data = None
-    move_empty_elements_back(genres)
-    if genres[0]:
-        spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
-        mongodb_api = MongoDBFacade("MONGO_CONNECTION_STRING")
-
-        # TODO: Replace the local with the mongoDB Server 
-        df = pd.read_csv("temp/CLEANED_featured_Spotify_artist_info.csv")
-        tracks = df[df["genres"].str.contains(genres[0].lower(), case=False, na=False)]
-
-        genre_data = tracks.to_html(classes="table table-striped", border=0)
     
-    return render_template('genre.html', input = genres[0], form = form, output = genre_data, input_comparison_1 = genres[1])
+    print(f"Genre 1: {genres[0]}, Genre 2: {genres[1]}, Genre 3: {genres[2]}")
+
+    move_empty_elements_back(genres)
+
+    if genres[0]:
+        for genre in genres:
+            if not genre:
+                break; 
+            
+            filtered_df = artist_info_csv[
+                artist_info_csv["genres"].str.contains(
+                    genre.lower(), case=False, na=False)].copy()
+            
+            if not filtered_df.empty:
+                filtered_df["Genre"] = genre 
+                comparisons.append(filtered_df)
+
+        if comparisons:
+            df_combined = pd.concat(comparisons)
+
+            fig = px.histogram(df_combined, x="popularity", color="Genre", 
+                               barmode="overlay", nbins=100,
+                               title="Popularity Distribution of the Genres")
+            
+            fig.update_layout(xaxis_title="Popularity", yaxis_title="Count", bargap=0.2)
+            fig_html = fig.to_html(full_html=False)
+
+    return render_template('genre.html', inputs=genres,
+                           form=form, output=genre_data, 
+                           histogram=fig_html)
 
 @views.route('/track', methods=['GET', 'POST'])
 def track():
