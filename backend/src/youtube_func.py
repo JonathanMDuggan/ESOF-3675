@@ -31,10 +31,10 @@ class GoogleAPIFacade:
         response = request.execute()
         return response
     
-    def get_video_statistics(self, video_id: str):
+    def get_video_statistics(self, video_ids: str):
         request = self.youtube.videos().list(
             part='statistics',
-            id=video_id
+            id=",".join(video_ids)
         )
         response = request.execute()
         return response

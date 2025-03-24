@@ -1,12 +1,15 @@
 import json
 import os
+import random
 
 import numpy as np
 from data_viz import plot_boxplot, plot_heatmap, plot_histogram, plot_scatterplot, plot_seaborn_histogram
 from genre_scraper import get_genres, load_and_get_genres_into_db
+from import_csv import extract_relevant_data_from_tracks
 from mongo_func import MongoDBFacade
 from reporting import report_stats_for_albums, report_stats_for_artists, report_stats_for_tracks
-from util_func import add_video_stats_to_tracks, extract_album_ids_from_tracks, extract_artist_ids_from_tracks, extract_relavant_album_info_from_details, extract_relavant_artist_info_from_details, extract_relavant_track_info_from_details
+from unofficial_youtube_func import UnOfficialYoutubeAPIFacade
+from util_func import add_video_stats_to_tracks, extract_album_ids_from_tracks, extract_artist_ids_from_tracks, extract_relavant_album_info_from_details, extract_relavant_artist_info_from_details, extract_relavant_track_info_from_details, extract_relavant_track_info_from_details_youtube, extract_track_details_from_csv, filter_junction_table_data_by_keys_using_db_collection, get_artists_details, get_artists_top_tracks, get_track_ids_to_video_ids_dict, get_video_statistics
 from youtube_func import GoogleAPIFacade
 from spotify_func import SpotifyAPIFacade
 import pymongo
@@ -27,13 +30,16 @@ collection_name_artist_genre = "artist_genre_link"
 collection_name_track_genre = "track_genre_link"
 collection_name_artist_track = "artist_track_link"
 collection_name_artist_album = "artist_album_link"
+limit_tracks_per_run = 50
 
 
 def get_data(insert_data=False):
-
+    dirname = os.path.dirname(__file__)
+    filepath = os.path.join(dirname, "browser.json")
     google_api = GoogleAPIFacade("YOUTUBE_API_KEY")
     spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
     mongodbClient = MongoDBFacade("MONGO_CONNECTION_STRING")
+    unoffical_youtube_api = UnOfficialYoutubeAPIFacade(filepath)
 
     # Get the data from the database
 
@@ -56,11 +62,18 @@ def get_data(insert_data=False):
 
     # Get the top 5 tracks of the top 5 artists
 
-    top_five_genres = spotify_api.get_available_genre_seeds()
+    ############################################################################################################
+    # Get random tracks, below code is commented out because it is not needed for now
+    ############################################################################################################
+    # top_five_genres = spotify_api.get_available_genre_seeds()
+    # random_tracks = spotify_api.get_recommendations([], top_five_genres, [])
+    # random_tracks = random_tracks[:10]
 
-    random_tracks = spotify_api.get_recommendations([], top_five_genres, [])
-    
-    random_tracks = random_tracks[:10]
+
+    track_ids_from_database = [track['id'] for track in tracks]
+    random_tracks = extract_relevant_data_from_tracks(spotify_api, track_ids_from_database, limit_tracks_per_run)
+    ############################################################################################################
+
     # Get the ids of the random tracks
     track_ids = [track['id'] for track in random_tracks]
 
@@ -78,7 +91,9 @@ def get_data(insert_data=False):
 #         albums_result = mongodbClient.find_many(database_name, collection_name_album, {})
 #         return {"tracks": tracks_result, "artists": artists_result, "albums": albums_result}
 
-    
+    print("Number of random tracks: ", len(random_tracks))
+    #json print tracks
+    # print(json.dumps(random_tracks, indent=4))
 
     # Get a list of dict of artist id and track id
     artist_track_link = [{"artist_id": artist['id'], "track_id": track['id']} for track in random_tracks for artist in track['artists']]
@@ -120,6 +135,30 @@ def get_data(insert_data=False):
     # Filter out the duplicates in the artist_genre_link
     artist_genre_link = filter_junction_table_data_by_keys_using_db_collection(artist_genre_link, artist_genre_link_database, "artist_id", "genre_id")
 
+    ############################################################################################################
+    # Get links for track/genre and album/genre from the csv file (only) not from the api
+    ############################################################################################################
+
+    track_genre_link = [{"track_id": track['id'], "genre_id": genre_dict.get(track['track_csv']['playlist_genre'].lower(), None)} for track in random_tracks]
+    track_genre_link = [link for link in track_genre_link if link['genre_id'] != None]
+    # Get the track_genre_link from the database
+    track_genre_link_database = mongodbClient.find_many(database_name, collection_name_track_genre, {})
+    # Filter out the duplicates in the track_genre_link
+    track_genre_link = filter_junction_table_data_by_keys_using_db_collection(track_genre_link, track_genre_link_database, "track_id", "genre_id")
+
+    # Same for album/genre
+    album_genre_link = [{"album_id": track['album']['id'], "genre_id": genre_dict.get(track['track_csv']['playlist_genre'].lower(), None)} for track in random_tracks]
+    album_genre_link = [link for link in album_genre_link if link['genre_id'] != None]
+    # Get the album_genre_link from the database
+    album_genre_link_database = mongodbClient.find_many(database_name, collection_name_album_genre, {})
+    # Filter out the duplicates in the album_genre_link
+    album_genre_link = filter_junction_table_data_by_keys_using_db_collection(album_genre_link, album_genre_link_database, "album_id", "genre_id")
+
+    ############################################################################################################
+
+
+
+
     artists_info_extracted = extract_relavant_artist_info_from_details(
          artists_details)
 
@@ -135,7 +174,7 @@ def get_data(insert_data=False):
 #          random_tracks_details)
 
     # Use random_tracks_details to get stats about corresponding music video from google api
-    track_ids_to_video_ids_dict = get_track_ids_to_video_ids_dict(random_tracks, google_api)
+    track_ids_to_video_ids_dict = get_track_ids_to_video_ids_dict(random_tracks, google_api, unofficial_youtube_api=unoffical_youtube_api)
 
     video_statistics_dict = get_video_statistics(track_ids_to_video_ids_dict, google_api)
 
@@ -145,9 +184,12 @@ def get_data(insert_data=False):
     # Filter out the video statistics that are already in the database
     video_statistics_dict = {track_id: video_statistics for track_id, video_statistics in video_statistics_dict.items() if track_id not in existing_video_statistics_id_set}
 
-    
-    tracks_info_extracted = extract_relavant_track_info_from_details(random_tracks)
-
+    ############################################################################################################
+    # Extract final info for tracks
+    ############################################################################################################
+    # tracks_info_extracted = extract_relavant_track_info_from_details(random_tracks)
+    tracks_info_extracted = extract_track_details_from_csv(random_tracks)
+    ############################################################################################################
 
     # Insert the data into the database
     if insert_data:
@@ -177,6 +219,8 @@ def get_data(insert_data=False):
 
 
         mongodbClient.insert_many(database_name, collection_name_artist_genre, artist_genre_link) if len(artist_genre_link) > 0 else None
+        mongodbClient.insert_many(database_name, collection_name_album_genre, album_genre_link) if len(album_genre_link) > 0 else None
+        mongodbClient.insert_many(database_name, collection_name_track_genre, track_genre_link) if len(track_genre_link) > 0 else None
 
         # Create and insert the artist_track_link and artist_album_link
         mongodbClient.create_collection(database_name, collection_name_artist_track) if mongodbClient.get_collection(database_name, collection_name_artist_track) == None else None

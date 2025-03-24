@@ -115,10 +115,21 @@ class SpotifyAPIFacade:
     def get_several_albums(self, album_ids: list):
         if album_ids == None: 
             logging.error("Album IDs cannot be None")
-            return None
-        QUERY = f'?ids={",".join(album_ids)}'
-        result = self.json_from_query("albums", QUERY)
-        return result['albums']
+            return
+        albums = []
+        if len(album_ids) > 20:
+            # split the list into chunks of 20
+            album_chunks = [album_ids[i:i + 20] for i in range(0, len(album_ids), 20)]
+            for chunk in album_chunks:
+                QUERY = f'?ids={",".join(chunk)}'
+                result = self.json_from_query("albums", QUERY)
+                albums += result['albums']
+        else:
+            QUERY = f'?ids={",".join(album_ids)}'
+            result = self.json_from_query("albums", QUERY)
+            albums += result['albums']
+        print(albums)
+        return albums
     
     def get_artist_albums(self, artist_id: str, limit=20):
         if artist_id == None:
