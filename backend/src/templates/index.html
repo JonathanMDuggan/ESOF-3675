@@ -1,7 +1,24 @@
-{%extends 'base.html' %}
-{%block head %}
+{% extends "main_navbar.html" %}
+{% block title %}Test 123{% endblock %}
 
-{%endblock%}
-{%block body%}
-<h1>Hello World!<h1>
-{%endblock%}
+{% block content %}
+<div class="container">
+<div class="page-header">
+    <h1>Discover Artist</h1>
+    </div>
+</div>
+
+
+<form id="mainSearchBar">    
+    <div class="container">
+        <div class="col-md-6">
+            <div class="search-container">
+                <input type="Search" class="form-control rounded" placeholder="Search for Artist" aria-label="Search" aria-describedby="search-addon" />
+            </div>
+            <button class="btn btn-outline-secondary" type="submit" id="search-addon">
+                Search<i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}

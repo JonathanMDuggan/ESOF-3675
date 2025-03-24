@@ -64,6 +64,14 @@ class SpotifyAPIFacade:
         result = self.json_from_query("tracks", QUERY)
         return result
     
+    def get_artist(self, artist_id):
+        if artist_id == None:
+            logging.error("Artist ID cannot be None")
+            return None
+        QUERY = f'{artist_id}/'
+        result = self.json_from_query("artists", QUERY)
+        return result
+
     def get_artist_top_tracks(self, artist_id):
         if artist_id == None:
             logging.error("Artist ID cannot be None")

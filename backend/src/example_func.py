@@ -43,12 +43,14 @@ def OutlierExample():
     # Create the Horizontal Bar Graphs
     fig, ax = plt.subplots()
     ax.barh(weeknd_panda['name'], weeknd_panda['popularity'])
-    ax.set_ylabel('popularity')
+    ax.set_ylabel('Song ')
+    ax.set_xlabel('Popularity Score')
     ax.set_title('The Weeknd: Top Songs')
     
     fig, ax = plt.subplots()
     ax.barh(gotye_panda['name'], gotye_panda['popularity'])
     ax.set_ylabel('popularity')
+
     ax.set_title('Gotye: Top Songs')
 
     # Visualize the Data
@@ -80,7 +82,8 @@ def popularity_example():
     # Create the Horizontal Bar Graphs
     fig, ax = plt.subplots()
     ax.barh(rap_panda['name'], rap_panda['popularity'])
-    ax.set_ylabel('popularity')
+    ax.set_ylabel('popularity score')
+    ax.set_xlabel('genre')
     ax.set_title('Rap popularity')
     
     fig, ax = plt.subplots()
@@ -106,6 +109,8 @@ def duration_distribution_example():
     plt.show()
 
 def box_plot():
+
+
     spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
 
     rap = spotify_api.search_for_item("track", None , 50, "genre%3Arap")
@@ -149,8 +154,11 @@ def box_plot():
                    tick_labels=labels)  # will be used to label x-ticks
     for patch, color in zip(bplot['boxes'], colors):
         patch.set_facecolor(color)
-    plt.title("Box Plot of Genre Popularity")
+    plt.rc('font', size=12)
+    plt.rc('axes', titlesize=12)
+    plt.title("Box Plot of Genre Popularity In Canada")
     plt.ylabel("Popularity")
+    plt.xlabel("Genre")
     plt.show()
 
 def correlation():

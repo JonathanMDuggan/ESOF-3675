@@ -1,0 +1,83 @@
+{% extends "main_navbar.html" %}
+{% block content %}
+{% if input and not input_comparison_1 %}
+<div class="container">
+    <div class="row">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="col-lg-2">
+                {{ form.input.label(class="form-label") }}
+                {{ form.input(class="form-label-lg", placeholder="Enter Text", value=input , id="input-field") }}
+            </div>
+            <div class="col-lg-2">
+                {{ form.input_comparison_1.label(class="form-label-lg") }}
+                {{ form.input_comparison_1(class="form-label-lg", placeholder="Add Comparison" , id="input-field") }}
+            </div>
+            <br/>
+            {{ form.submit(class="btn btn-secondary") }}
+        </form>
+    </div>
+</div>
+{% elif input_comparison_1 and input %}
+<div class="container">
+    <div class="row">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="col-lg-2">
+                {{ form.input.label(class="form-label") }}
+                {{ form.input(class="form-label-lg", placeholder="Enter Text", value=input, id="input-field") }}
+            </div>
+            <div class="col-lg-2">
+                {{ form.input_comparison_1.label(class="form-label-lg") }}
+                {{ form.input_comparison_1(class="form-label-lg", placeholder="Enter Text", value=input_comparison_1, id="input-field") }}
+            </div>
+            <div class="col-lg-2">
+                {{ form.input_comparison_2.label(class="form-label-lg") }}
+                {{ form.input_comparison_2(class="form-label-lg", placeholder="Enter Text", id="input-field") }}
+            </div>
+            <br/>
+            {{ form.submit(class="btn btn-secondary") }}
+        </form>
+    </div>
+</div>
+
+{% elif input_comparison_1 and input_comparison_2 and input %}
+<div class="container">
+    <div class="row">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="col-lg-2">
+                {{ form.input.label(class="form-label") }}
+                {{ form.input(class="form-label-lg", placeholder=input, id="input-field") }}
+            </div>
+            <div class="col-lg-2">
+                {{ form.input_comparison_1.label(class="form-label-lg") }}
+                {{ form.input_comparison_1(class="form-label-lg", placeholder=input_comparison_1, id="input-field") }}
+            </div>
+            <div class="col-lg-2">
+                {{ form.input_comparison_2.label(class="form-label-lg") }}
+                {{ form.input_comparison_2(class="form-label-lg", placeholder="Add Comparison", id="input-field") }}
+            </div>
+            <br/>
+            {{ form.submit(class="btn btn-secondary") }}
+        </form>
+    </div>
+</div>
+
+{% else %}
+<div class="container">
+    <div class="page-header">
+        <h1>Discover Genres</h1>
+    </div>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="col-sm-9 p-3">
+            {{ form.input.label(class="form-label") }}
+            {{ form.input(class="form-control") }}
+        </div>
+        <br/>
+        {{ form.submit(class="btn btn-secondary") }}
+    </form>
+</div>
+{% endif %}
+{% endblock %}
