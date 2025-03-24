@@ -41,7 +41,7 @@ class SpotifyAPIFacade:
             return
         if limit <= 0:
             logging.error("The limit cannot be less than 1")
-            return
+            return None
         if type_name == None:
             QUERY = f'?q={q}&type={type}&limit={limit}'
         else:
@@ -67,7 +67,7 @@ class SpotifyAPIFacade:
     def get_artist_top_tracks(self, artist_id):
         if artist_id == None:
             logging.error("Artist ID cannot be None")
-            return
+            return None
         QUERY = f'{artist_id}/top-tracks'
         result = self.json_from_query("artists", QUERY)
         return result
@@ -91,7 +91,7 @@ class SpotifyAPIFacade:
     def get_several_artists(self, artist_ids: list):
         if artist_ids == None:
             logging.error("Artist IDs cannot be None")
-            return
+            return None
         QUERY = f'?ids={",".join(artist_ids)}'
         result = self.json_from_query("artists", QUERY)
         return result['artists']
@@ -99,13 +99,13 @@ class SpotifyAPIFacade:
     def get_several_tracks(self, track_ids: list):
         if track_ids == None:
             logging.error("Track IDs cannot be None")
-            return
+            return None
         QUERY = f'?ids={",".join(track_ids)}'
         result = self.json_from_query("tracks", QUERY)
         return result['tracks']
     
     def get_several_albums(self, album_ids: list):
-        if album_ids == None:
+        if album_ids == None: 
             logging.error("Album IDs cannot be None")
             return
         albums = []
@@ -126,24 +126,24 @@ class SpotifyAPIFacade:
     def get_artist_albums(self, artist_id: str, limit=20):
         if artist_id == None:
             logging.error("Artist ID cannot be None")
-            return
+            return None
         if 1 <= limit <= 50:
             QUERY = f'{artist_id}/albums?limit={limit}'
         else:
             logging.error("The limit must be between 1 and 50")
-            return
+            return None
         result = self.json_from_query("artists", QUERY)
         return result['items']
 
     def get_album_tracks(self, album_id: str, limit=20):
         if album_id == None:
             logging.error("Album ID cannot be None")
-            return
+            return None
         if 1 <= limit <= 50:
             QUERY = f'{album_id}/tracks?limit={limit}'
         else:
             logging.error("The limit must be between 1 and 50")
-            return
+            return None
         result = self.json_from_query("albums", QUERY)
         return result['items']
 
@@ -151,11 +151,11 @@ class SpotifyAPIFacade:
                                 track_limit=20):
         if artist_id == None:
             logging.error("Artist IDs cannot be None")
-            return
+            return None
         albums = self.get_artist_albums(artist_id, album_limit)
         if albums == None:
-            return
+            return None
         tracks = []
         for album in albums:
             tracks.append(self.get_album_tracks(album['id'], track_limit))
-        return tracks
+        return tracks 
