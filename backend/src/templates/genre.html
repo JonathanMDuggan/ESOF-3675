@@ -1,7 +1,9 @@
 {% extends "main_navbar.html" %} 
 {% block content %}
 {% if inputs[0] and not inputs[1] %}
-<!-- TODO: Rewrite HTML to dynamically render the page based on elements of the inputs list-->
+<!-- TODO: Rewrite HTML to dynamically render the page based on elements of the inputs list
+           This whole block can be done in a single for each loop
+-->
 <div class="container">
     <div class="row">
         <form method="POST">
@@ -22,7 +24,7 @@
     <br/>
     </div>
 </div>
-{% elif inputs[0] and inputs[1] %}
+{% elif inputs[0] and inputs[1] and not inputs[2]%}
 <div class="container">
     <div class="row">
         <form method="POST">
@@ -66,12 +68,16 @@
                 {{ form.input_comparison_2.label(class="form-label-lg") }}
                 {{ form.input_comparison_2(class="form-label-lg", placeholder="Add Second Comparison", value=inputs[2], id="input-field") }}
             </div>
+            <div class="col-lg-2">
+                {{ form.input_comparison_3.label(class="form-label-lg") }}
+                {{ form.input_comparison_3(class="form-label-lg", placeholder="Add Third Comparison", id="input-field") }}
+            </div>
             <br/>
             {{ form.submit(class="btn btn-secondary") }}
         </form>
-        <br>
-        <div>{{ histogram | safe }}</div>            
-    <br/>
+               <br>
+            <div>{{ histogram | safe }}</div>            
+        <br/>
     </div>
 </div>
 
