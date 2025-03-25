@@ -150,29 +150,28 @@ def move_empty_elements_back(items):
     return sorted(items, key=lambda x: not bool(x))
 
 # VERY SLOW, NEEDS A WHOLE REWRITE!!!! - Jonathan Duggan 2024-03-24
-def apriori_algorithm(genre):
-    filtered_df = artist_info_csv[artist_info_csv["genres"].str.contains(genre.lower(), case=False, na=False)].copy()
-    
-    filtered_df["genres"] = filtered_df["genres"].apply(lambda x: x.split(', ') if isinstance(x, str) else [])
 
-    items = filtered_df["genres"].tolist()
+def apriori_algorithm(genre):
+    genre = genre.lower()
+    
+    mask = artist_info_csv["genres"].str.contains(genre, case=False, na=False)
+    filtered_df = artist_info_csv.loc[mask, "genres"]
+
+    items = [x.split(', ') for x in filtered_df if isinstance(x, str)]
 
     encoder = TransactionEncoder()
     encoded_items = encoder.fit_transform(items)
     
-    df_sample = pd.DataFrame(encoded_items, columns=encoder.columns_)
-    df_sample = df_sample.replace({False: 0, True: 1})  
+    df_sample = pd.DataFrame(encoded_items, columns=encoder.columns_, dtype=bool)
 
-    print(f'Number of transactions: {len(df_sample)}')
-    print(f'Number of items: {len(df_sample.columns)}')
-    print(f'Unique items are: {list(df_sample.columns)}')
+    print(f'Number of transactions: {df_sample.shape[0]}')
+    print(f'Number of unique items: {df_sample.shape[1]}')
 
     support_count = len(df_sample) / 1000
     df_itemset_max_1 = apriori(df_sample, min_support=support_count / len(df_sample), use_colnames=True)
-    
-    top_list = df_itemset_max_1.head(25)
-    top_list["itemsets"] = top_list["itemsets"].apply(lambda x: ', '.join(list(x)) if isinstance(x, (set, tuple)) else x)
 
-    print("KILLER KEEMSTARRRR!! ", top_list)
+    df_itemset_max_1["itemsets"] = df_itemset_max_1["itemsets"].apply(lambda x: ', '.join(x))
+
+    print("Results: ", df_itemset_max_1.head(25))
     
-    return top_list.to_html(classes="table table-striped", index=False)
+    return df_itemset_max_1.head(25).to_html(classes="table table-striped", index=False)
