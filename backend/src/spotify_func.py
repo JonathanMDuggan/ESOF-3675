@@ -97,6 +97,9 @@ class SpotifyAPIFacade:
                                     ,50)
     
     def get_several_artists(self, artist_ids: list):
+        # For some reason if the list is one element the program crashes
+        # Don't know why this happens 
+        # 2025-3-25 - Jonathan Duggan
         if artist_ids == None:
             logging.error("Artist IDs cannot be None")
             return None

@@ -9,6 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mongo_func import *
+from mlxtend.frequent_patterns import apriori, association_rules
+from mlxtend.preprocessing import TransactionEncoder
 import os 
 import csv
 
@@ -19,7 +21,9 @@ import csv
 #   a. Rewrite the logic to dynamically produce the figures and tables (using a for loop)
 #   b. Rewrite the inputs as list instead of discrete variables
 
-
+NUMBER_OF_ELEMENTS = 4
+spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
+mongodb_api = MongoDBFacade("MONGO_CONNECTION_STRING")
 artist_info_csv = pd.read_csv("temp/CLEANED_featured_Spotify_artist_info.csv")
 
 
@@ -65,10 +69,11 @@ def artist():
 
 @views.route('/genre', methods=['GET', 'POST'])
 def genre():
-    print("GENRE: !!!")
+    print("Loading genre page")
     fig_html = None
     comparisons = []
-    genres = [None] * 4
+    recommendations = []
+    genres = [None] * NUMBER_OF_ELEMENTS
     genres[0], genres[1], genres[2], genres[3], form = read_input(InputForm)
     genre_data = None
     
@@ -79,16 +84,17 @@ def genre():
     if genres[0]:
         for genre in genres:
             if not genre:
-                break; 
+                break
             
             filtered_df = artist_info_csv[
                 artist_info_csv["genres"].str.contains(
                     genre.lower(), case=False, na=False)].copy()
             
+            recommendations.append(apriori_algorithm(genre)) 
             if not filtered_df.empty:
                 filtered_df["Genre"] = genre 
                 comparisons.append(filtered_df)
-
+            
         if comparisons:
             df_combined = pd.concat(comparisons)
 
@@ -96,19 +102,20 @@ def genre():
                                barmode="overlay", nbins=100,
                                title="Popularity Distribution of the Genres")
             
-            fig.update_layout(xaxis_title="Popularity", yaxis_title="Count", bargap=0.2)
+            fig.update_layout(xaxis_title="Popularity",
+                            yaxis_title="Count", bargap=0.2)
+            
             fig_html = fig.to_html(full_html=False)
+        print(recommendations[0])
 
     return render_template('genre.html', inputs=genres,
                            form=form, output=genre_data, 
-                           histogram=fig_html)
+                           histogram=fig_html, suggestions=recommendations)
 
 @views.route('/track', methods=['GET', 'POST'])
 def track():
     track, track_1, track_2, track_3,  form = read_input(InputForm)
     if track:
-        spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
-        mongodb_api = MongoDBFacade("MONGO_CONNECTION_STRING")
 
         df = pd.read_csv("backend/tracks.csv")
         tracks = df[df["genres"].str.contains(genre.lower(), case=False, na=False)]
@@ -141,3 +148,31 @@ def read_input(form_class):
 
 def move_empty_elements_back(items):
     return sorted(items, key=lambda x: not bool(x))
+
+# VERY SLOW, NEEDS A WHOLE REWRITE!!!! - Jonathan Duggan 2024-03-24
+def apriori_algorithm(genre):
+    filtered_df = artist_info_csv[artist_info_csv["genres"].str.contains(genre.lower(), case=False, na=False)].copy()
+    
+    filtered_df["genres"] = filtered_df["genres"].apply(lambda x: x.split(', ') if isinstance(x, str) else [])
+
+    items = filtered_df["genres"].tolist()
+
+    encoder = TransactionEncoder()
+    encoded_items = encoder.fit_transform(items)
+    
+    df_sample = pd.DataFrame(encoded_items, columns=encoder.columns_)
+    df_sample = df_sample.replace({False: 0, True: 1})  
+
+    print(f'Number of transactions: {len(df_sample)}')
+    print(f'Number of items: {len(df_sample.columns)}')
+    print(f'Unique items are: {list(df_sample.columns)}')
+
+    support_count = len(df_sample) / 1000
+    df_itemset_max_1 = apriori(df_sample, min_support=support_count / len(df_sample), use_colnames=True)
+    
+    top_list = df_itemset_max_1.head(25)
+    top_list["itemsets"] = top_list["itemsets"].apply(lambda x: ', '.join(list(x)) if isinstance(x, (set, tuple)) else x)
+
+    print("KILLER KEEMSTARRRR!! ", top_list)
+    
+    return top_list.to_html(classes="table table-striped", index=False)
