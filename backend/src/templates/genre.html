@@ -25,6 +25,11 @@
         <div>{{ histogram | safe }}</div> 
     <br/>
     <br>
+    <div>
+        {{timeline | safe}}
+    </div>
+    <br/>
+    <br>
     <h3>Related genres like {{inputs[0]}}</h3>
     <div>{{ suggestions[0] | safe }}</div> 
 <br/>
@@ -50,6 +55,10 @@
         </form>
         <br>
             <div>{{ histogram | safe }}</div>            
+        <br/>
+        <div>
+            {{timeline | safe}}
+        </div>
         <br/>
         <br>
         <h3>Related genres like {{inputs[0]}}</h3>
@@ -84,7 +93,11 @@
             {{ form.submit(class="btn btn-secondary") }}
         </form>
                <br>
-            <div>{{ histogram | safe }}</div>            
+            <div>{{ histogram | safe }}</div> 
+            <div>
+                {{timeline | safe}}
+            </div>
+            <br/>           
         <br/>
     </div>
 </div>
@@ -106,16 +119,16 @@
                 {{ form.input_comparison_3.label(class="form-label-lg") }}
                 {{ form.input_comparison_3(class="form-label-lg", placeholder="Add Third Comparison", value=inputs[3], id="input-field") }}
             </div>
-            <div class="col-lg-2">
-                {{ form.input_comparison_3.label(class="form-label-lg") }}
-                {{ form.input_comparison_3(class="form-label-lg", placeholder="Add Fourth Comparison", id="input-field") }}
-            </div>
             <br/>
             
             {{ form.submit(class="btn btn-secondary") }}
         </form>
                <br>
-            <div>{{ histogram | safe }}</div>            
+            <div>{{ histogram | safe }}</div> 
+            <div>
+                {{timeline | safe}}
+            </div>
+            <br/>           
         <br/>
     </div>
 </div>

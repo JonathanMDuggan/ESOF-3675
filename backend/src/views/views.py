@@ -8,7 +8,10 @@ from spotify_func import *
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
+import plotly.graph_objects as go
+import numpy as np
 from mongo_func import *
+from scipy.interpolate import interp1d 
 from mlxtend.frequent_patterns import apriori, association_rules
 from mlxtend.preprocessing import TransactionEncoder
 import os 
@@ -70,14 +73,15 @@ def artist():
 @views.route('/genre', methods=['GET', 'POST'])
 def genre():
     print("Loading genre page")
-    fig_html = None
+    histogram_html = None
     comparisons = []
+    genre_match = [] # Genres that exist on the spotify platform
     recommendations = []
-    genres = [None] * NUMBER_OF_ELEMENTS
+    genres = [None] * NUMBER_OF_ELEMENTS # Genres the user entered to the website
     genres[0], genres[1], genres[2], genres[3], form = read_input(InputForm)
     genre_data = None
     
-    print(f"Genre 1: {genres[0]}, Genre 2: {genres[1]}, Genre 3: {genres[2]}")
+    print(f"Genre 1: {genres[0]}, Genre 2: {genres[1]}, Genre 3: {genres[2]}, Genre 4: {genres[3]}")
 
     move_empty_elements_back(genres)
 
@@ -93,9 +97,10 @@ def genre():
             recommendations.append(apriori_algorithm(genre)) 
             if not filtered_df.empty:
                 filtered_df["Genre"] = genre 
+                genre_match.append(genre)
                 comparisons.append(filtered_df)
             
-        if comparisons:
+        if comparisons: # Checks if any genre the user entered exist in the database
             df_combined = pd.concat(comparisons)
 
             fig = px.histogram(df_combined, x="popularity", color="Genre", 
@@ -105,12 +110,15 @@ def genre():
             fig.update_layout(xaxis_title="Popularity",
                             yaxis_title="Count", bargap=0.2)
             
-            fig_html = fig.to_html(full_html=False)
+            histogram_html = fig.to_html(full_html=False)
+            timeline_html = genre_popularity_history(genre_match)
         print(recommendations[0])
 
     return render_template('genre.html', inputs=genres,
                            form=form, output=genre_data, 
-                           histogram=fig_html, suggestions=recommendations)
+                           histogram=histogram_html, 
+                           suggestions=recommendations, 
+                           timeline = timeline_html)
 
 @views.route('/track', methods=['GET', 'POST'])
 def track():
@@ -175,3 +183,56 @@ def apriori_algorithm(genre):
     print("Results: ", df_itemset_max_1.head(25))
     
     return df_itemset_max_1.head(25).to_html(classes="table table-striped", index=False)
+
+# Find a better data set PLEASE! the one on mongodb DOES NOT HAVE RAP
+# also, k-pop crashes the server, probably because of the - token maybe? 
+# Just go on kraggle and look for one brother 
+# - Jonathan Duggan 2025-03-26
+def genre_popularity_history(genres):
+    genre_history = mongodb_api.client["music"]
+    print("genre popularity history", genres)
+    result = genre_history["genre_history"].aggregate([
+    {
+        "$match": {
+          "name": {"$in": genres },
+          "count": {"$gte": 2},
+        }
+    }
+    ])
+
+    df = pd.DataFrame(result)
+    fig = go.Figure()
+    df["release_date"] = pd.to_datetime(df["release_date"], format="%Y")
+    print("Unique Genres in Data:", df["name"].unique())
+    print(df)
+    for genre in genres:
+        df_genre = df[df["name"] == genre].sort_values(by="release_date")
+
+        if df_genre.empty:
+            continue 
+
+        x = df_genre["release_date"]
+        y = df_genre["popularity"]
+
+        n = np.arange(len(x))
+
+        x_spline = interp1d(n, x.astype(np.int64), kind="linear")
+        y_spline = interp1d(n, y, kind="cubic")
+
+        
+        n_ = np.linspace(n.min(), n.max(), 500)
+        x_ = pd.to_datetime(x_spline(n_))
+        y_ = y_spline(n_)
+
+        
+        fig.add_trace(go.Scatter(x=x_, y=y_, mode="lines", name=genre))
+
+    fig.update_layout(
+        title="Popularity Over Time for Multiple Genres",
+        xaxis_title="Release Date",
+        yaxis_title="Popularity",
+        xaxis=dict(showgrid=True),
+        yaxis=dict(showgrid=True),
+    )
+
+    return fig.to_html(full_html=False)
