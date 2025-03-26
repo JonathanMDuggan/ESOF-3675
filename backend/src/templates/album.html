@@ -1,0 +1,23 @@
+{% extends "main_navbar.html" %}
+{%block content %}
+{% if input %}
+<div class="container">    
+    <h1 class="text-center mt-4">{{input}}</h1>
+</div>
+{% else %}
+<div class="container">
+    <div class="page-header">
+        <h1>Discover Albums</h1>
+    </div>
+    <form method="POST">
+        <div class ="col-sm-9 p-3">
+            {{form.hidden_tag()}}
+            {{form.input.label(class = "form-label")}}
+            {{form.input(class="form-control")}}
+        </div>
+        <br/>
+        {{form.submit(class="btn btn-secondary" )}}
+    </form>
+</div>
+{%  endif %}
+{% endblock %}
