@@ -21,7 +21,7 @@ from scipy.stats import chi2_contingency
 database_name = "music"
 
 collection_name_music_video = "music_video"
-collection_name_track = "tracks"
+collection_name_track = "sample_tracks"
 collection_name_artist = "artists"
 collection_name_album = "albums"
 collection_name_genre = "genres"
@@ -240,92 +240,77 @@ def get_data(insert_data=False):
 
 
 def process_data_from_db(data=None):
-     mongodbClient = MongoDBFacade("MONGO_CONNECTION_STRING")
+    mongodbClient = MongoDBFacade("MONGO_CONNECTION_STRING")
+    sns.set(font_scale=1.8)
+    # Get the data from the database
+    tracks = mongodbClient.find_many(
+         database_name, 
+         collection_name_track, {}) #if data == None else data['tracks']
+    artists = mongodbClient.find_many(
+         "music", 
+         collection_name_artist, {}) #if data == None else data['artists']
+    albums = mongodbClient.find_many(
+         "music",
+         collection_name_album, {}) #if data == None else data['albums']
+    
+    # # Convert the data to dataframes
+    tracks_df = pd.DataFrame(tracks).fillna(value=np.nan)
+    artists_df = pd.DataFrame(artists).fillna(value=np.nan)
+    albums_df = pd.DataFrame(albums).fillna(value=np.nan)
+    # Get the shape of the Dataframes
 
+    print("Shape of the tracks dataframe")
+    print(tracks_df.shape)
+    print("Shape of the artists dataframe")
+    print(artists_df.shape)
+    print("Shape of the albums dataframe")
+    print(albums_df.shape)
 
-     # Get the data from the database
-     tracks = mongodbClient.find_many(
-          database_name, 
-          collection_name_track, {}) #if data == None else data['tracks']
-     artists = mongodbClient.find_many(
-          "music", 
-          collection_name_artist, {}) #if data == None else data['artists']
-     albums = mongodbClient.find_many(
-          "music",
-          collection_name_album, {}) #if data == None else data['albums']
-     
+    # # Get the statistical summary of the Dataframes
+    # print("Statistical summary of the tracks dataframe")
+    # print(tracks_df.describe())
+    # print("Statistical summary of the artists dataframe")
+    # print(artists_df.describe())
+    # print("Statistical summary of the albums dataframe")
+    # print(albums_df.describe())
+    # # Get the info of the Dataframes
+    # print("Info of the tracks dataframe")
+    # print(tracks_df.info())
+    # print("Info of the artists dataframe")
+    # print(artists_df.info())
+    # print("Info of the albums dataframe")
+    # print(albums_df.info())
+    # Get the stats for the data
+    #report_stats_for_tracks(tracks_df)
+    #report_stats_for_artists(artists_df)
+    #report_stats_for_albums(albums_df)
+    # plot_boxplot(tracks_df, "popularity")
+    # plot_boxplot(artists_df, "popularity")
+    # plot_boxplot(albums_df, "popularity")
 
-     # # Convert the data to dataframes
-     # tracks_df = pd.DataFrame(tracks).fillna(value=np.nan)
-     # artists_df = pd.DataFrame(artists).fillna(value=np.nan)
-     # albums_df = pd.DataFrame(albums).fillna(value=np.nan)
+    tracks_df = tracks_df.dropna()
+    artists_df = artists_df.dropna()
+    albums_df = albums_df.dropna()
 
+    tracks_drop_columns = ["_id", "id", "video_id", "video_name", "name", "explicit", "release_date", "release_date_precision"]
+    artists_drop_columns = ["_id", "id", "name"]
+    albums_drop_columns = ["_id", "id", "name", "release_date", "release_date_precision"]
 
-     # # Get the shape of the Dataframes
-     # print("Shape of the tracks dataframe")
-     # print(tracks_df.shape)
-     # print("Shape of the artists dataframe")
-     # print(artists_df.shape)
-     # print("Shape of the albums dataframe")
-     # print(albums_df.shape)
+    tracks_df = tracks_df.drop(columns=tracks_drop_columns)
+    artists_df = artists_df.drop(columns=artists_drop_columns)
+    albums_df = albums_df.drop(columns=albums_drop_columns)
 
-     # # Get the statistical summary of the Dataframes
-     # print("Statistical summary of the tracks dataframe")
-     # print(tracks_df.describe())
-     # print("Statistical summary of the artists dataframe")
-     # print(artists_df.describe())
-     # print("Statistical summary of the albums dataframe")
-     # print(albums_df.describe())
+    plot_heatmap(tracks_df)
+    plot_heatmap(artists_df)
+    plot_heatmap(albums_df)
 
-     # # Get the info of the Dataframes
-     # print("Info of the tracks dataframe")
-     # print(tracks_df.info())
-     # print("Info of the artists dataframe")
-     # print(artists_df.info())
-     # print("Info of the albums dataframe")
-     # print(albums_df.info())
-
-     # Get the stats for the data
-
-     # report_stats_for_tracks(tracks_df)
-     # report_stats_for_artists(artists_df)
-     # report_stats_for_albums(albums_df)
-
-     # plot_boxplot(tracks_df, "popularity")
-     # plot_boxplot(artists_df, "popularity")
-     # plot_boxplot(albums_df, "popularity")
-
-     # tracks_df = tracks_df.dropna()
-     # artists_df = artists_df.dropna()
-     # albums_df = albums_df.dropna()
-
-     # tracks_drop_columns = ["_id", "id", "video_id", "video_name", "name", "explicit", "release_date", "release_date_precision"]
-     # artists_drop_columns = ["_id", "id", "name"]
-     # albums_drop_columns = ["_id", "id", "name", "release_date", "release_date_precision"]
-
-     # tracks_df = tracks_df.drop(columns=tracks_drop_columns)
-     # artists_df = artists_df.drop(columns=artists_drop_columns)
-     # albums_df = albums_df.drop(columns=albums_drop_columns)
-
-     # plot_heatmap(tracks_df)
-     # plot_heatmap(artists_df)
-     # plot_heatmap(albums_df)
-
-     # plot_scatterplot(tracks_df, "popularity", "view_count")
-     # plot_scatterplot(tracks_df, "popularity", "like_count")
-     # plot_scatterplot(tracks_df, "popularity", "comment_count")
-     # plot_scatterplot(tracks_df, "popularity", "duration_ms")
-     # plot_scatterplot(tracks_df, "popularity", "track_number")
-
-     # plot_histogram(tracks_df, "popularity", 20)
-     # plot_seaborn_histogram(tracks_df, "popularity")
-
-
-
-
-
-
-
+    # plot_scatterplot(tracks_df, "popularity", "view_count")
+    # plot_scatterplot(tracks_df, "popularity", "like_count")
+    # plot_scatterplot(tracks_df, "popularity", "comment_count")
+    # plot_scatterplot(tracks_df, "popularity", "duration_ms")
+    # plot_scatterplot(tracks_df, "popularity", "track_number")
+    plot_histogram(tracks_df, "popularity", 20)
+    plot_seaborn_histogram(tracks_df, "popularity")
 
 
 

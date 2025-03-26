@@ -18,11 +18,11 @@ app.config['SECRET_KEY'] = "123"
 bootstrap = Bootstrap(app)
 app.register_blueprint(views)
 def main():
-    RUN_WEB_SERVER = True   
-    if RUN_WEB_SERVER == True:
+    RUN_WEB_SERVER = True
+    if RUN_WEB_SERVER:
         app.run(debug=True)
     else:
-        box_plot()
+        process_data_from_db()
 
 if __name__ == '__main__':
     main()

@@ -10,6 +10,7 @@ import json
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import seaborn as sns
 
 
 def OutlierExample():
@@ -180,8 +181,8 @@ def correlation():
     plt.title(f"Scatter Plot of Popularity and Followers for Rappers")
     plt.ylabel(f"Followers")
     plt.xlabel(f"Popularity")
+    sns.scatterplot(font_scale=5)
     plt.show()
-
 
 def correlation_youtube():
     spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
