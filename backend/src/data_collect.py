@@ -5,7 +5,7 @@ import random
 import numpy as np
 from data_viz import plot_boxplot, plot_heatmap, plot_histogram, plot_scatterplot, plot_seaborn_histogram
 from genre_scraper import get_genres, load_and_get_genres_into_db
-from import_csv import extract_relevant_data_from_tracks
+from import_csv import extract_relevant_data_from_tracks, retrieve_csv_data
 from mongo_func import MongoDBFacade
 from reporting import report_stats_for_albums, report_stats_for_artists, report_stats_for_tracks
 from unofficial_youtube_func import UnOfficialYoutubeAPIFacade
@@ -30,6 +30,8 @@ collection_name_artist_genre = "artist_genre_link"
 collection_name_track_genre = "track_genre_link"
 collection_name_artist_track = "artist_track_link"
 collection_name_artist_album = "artist_album_link"
+collection_raw_data = "raw_data"
+collection_name_genre_history = "genre_history"
 limit_tracks_per_run = 50
 
 
@@ -42,6 +44,16 @@ def get_data(insert_data=False):
     unoffical_youtube_api = UnOfficialYoutubeAPIFacade(filepath)
 
     # Get the data from the database
+
+    # mongodbClient.create_collection(database_name, collection_raw_data) if mongodbClient.get_collection(database_name, collection_raw_data) == None else None
+
+
+    # dataFrameRaw = retrieve_csv_data()
+    # dataFrameRaw = dataFrameRaw.dropna()
+    # dataFrameRaw = dataFrameRaw.drop_duplicates(subset=['track_id'])
+    # dataFrameRaw = dataFrameRaw.reset_index(drop=True)
+    # dataFrameRaw = dataFrameRaw.to_dict(orient='records')
+    # mongodbClient.insert_many(database_name, collection_raw_data, dataFrameRaw) if insert_data else None
 
     genre_dict = load_and_get_genres_into_db(mongodbClient, database_name, collection_name_genre)
     if mongodbClient.get_collection(database_name, collection_name_track) == None:
