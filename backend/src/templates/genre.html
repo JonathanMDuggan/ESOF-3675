@@ -78,19 +78,21 @@
         </div>
     </div>
     {% for table in suggestions %}
-    <h3>Related genres like {{inputs[loop.index0]}}</h3>
+    <h3>Related genres like {{ inputs[loop.index0] }}</h3>
     <table>
         <thead>
             <tr>
                 <th>Rank</th>
                 <th>Name of Genre</th>
+                <th>Link</th>
             </tr>
         </thead>
         <tbody>
             {% for row in table %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{row['itemsets']}}</td>
+                    <td>{{ row['itemsets'] }}</td>
+                    <td><a href="https://open.spotify.com/search/genre%3A{{ row['itemsets'] | urlencode }}" target="_blank">Link</a></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -128,23 +130,25 @@
             <br/>           
         <br/>
     {% for table in suggestions %}
-    <h3>Related genres like {{inputs[loop.index0]}}</h3>
-    <table>
-        <thead>
+    <h3>Related genres like {{ inputs[loop.index0] }}</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Name of Genre</th>
+            <th>Link</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in table %}
             <tr>
-                <th>Rank</th>
-                <th>Name of Genre</th>
+                <td>{{ loop.index }}</td>
+                <td>{{ row['itemsets'] }}</td>
+                <td><a href="https://open.spotify.com/search/genre%3A{{ row['itemsets'] | urlencode }}" target="_blank">Link</a></td>
             </tr>
-        </thead>
-        <tbody>
-            {% for row in table %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{row['itemsets']}}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% endfor %}
+    </tbody>
+</table>
     {% endfor %}
     </div>
 </div>
@@ -179,19 +183,21 @@
         <br/>
     </div>
     {% for table in suggestions %}
-    <h3>Related genres like {{inputs[loop.index0]}}</h3>
+    <h3>Related genres like {{ inputs[loop.index0] }}</h3>
     <table>
         <thead>
             <tr>
                 <th>Rank</th>
                 <th>Name of Genre</th>
+                <th>Link</th>
             </tr>
         </thead>
         <tbody>
             {% for row in table %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{row['itemsets']}}</td>
+                    <td>{{ row['itemsets'] }}</td>
+                    <td><a href="https://open.spotify.com/search/genre%3A{{ row['itemsets'] | urlencode }}" target="_blank">Link</a></td>
                 </tr>
             {% endfor %}
         </tbody>

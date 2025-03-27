@@ -76,7 +76,7 @@ def artist():
                             histogram = histogram_html)
 
 @views.route('/genre', methods=['GET', 'POST'])
-def genre():
+def genre(): 
     print("Loading genre page")
     histogram_html = None
     comparisons = []
