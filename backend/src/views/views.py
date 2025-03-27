@@ -190,7 +190,7 @@ def apriori_algorithm(genre):
 
     print("Results: ", df_itemset_max_1.head(25))
     
-    return df_itemset_max_1.head(20).tail(15).to_dict(index=True, orient="records")
+    return df_itemset_max_1.head(18).tail(15).to_dict(index=True, orient="records")
 
 # Find a better data set PLEASE! the one on mongodb DOES NOT HAVE RAP
 # also, k-pop crashes the server, probably because of the - token maybe? 

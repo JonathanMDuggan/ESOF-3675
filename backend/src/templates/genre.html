@@ -36,7 +36,9 @@
     <table>
         <thead>
             <tr>
+                <th>Rank</th>
                 <th>Name of Genre</th>
+                <th>Link</th>
             </tr>
         </thead>
         <tbody>
@@ -44,6 +46,7 @@
                 <tr>
                     <td>{{ loop.index }}</td>
                     <td>{{row['itemsets']}}</td>
+                    <td><a href="https://open.spotify.com/search/genre%3A{{ row['itemsets'] | urlencode }}" target="_blank">Link</a></td>
                 </tr>
             {% endfor %}
         </tbody>
