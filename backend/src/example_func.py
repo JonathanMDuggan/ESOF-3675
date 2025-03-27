@@ -62,7 +62,7 @@ def ExplicitExample():
 
 def popularity_example():
     spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
-        # Pass the artist ID to the get_artist_top_tracks function
+    # Pass the artist ID to the get_artist_top_tracks function
     rap = spotify_api.search_for_item("track", None , 50, "genre%3Arap")
     vapor_wave = spotify_api.search_for_item("track", None , 50, "genre%3Avaporwave")
     pop = spotify_api.search_for_item("track", None , 50, "genre%pop")
@@ -214,7 +214,3 @@ def correlation_youtube():
     plt.ylabel(f"Youtube Views")
     plt.xlabel(f"Popularity")
     plt.show()
-
-    
-
-

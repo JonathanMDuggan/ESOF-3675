@@ -31,7 +31,24 @@
     <br/>
     <br>
     <h3>Related genres like {{inputs[0]}}</h3>
-    <div>{{ suggestions[0] | safe }}</div> 
+    <!-- <div>{{ suggestions[0] | safe }}</div>  -->
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Name of Genre</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in suggestions[0] %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{row['itemsets']}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
 <br/>
     </div>
 </div>
@@ -59,17 +76,28 @@
         <div>
             {{timeline | safe}}
         </div>
-        <br/>
-        <br>
-        <h3>Related genres like {{inputs[0]}}</h3>
-        <div>{{ suggestions[0] | safe }}</div> 
-    <br/>
-    <br>
-    <h3>Related genres like {{inputs[1]}}</h3>
-    <div>{{ suggestions[1] | safe }}</div> 
-<br/>
     </div>
-</div>
+    {% for table in suggestions %}
+    <h3>Related genres like {{inputs[loop.index0]}}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name of Genre</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{row['itemsets']}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+    </div>
+  </div>
 
 {% elif inputs[0] and inputs[1] and inputs[2] and not inputs[3] %}
             {{ form.hidden_tag() }}
@@ -99,6 +127,25 @@
             </div>
             <br/>           
         <br/>
+    {% for table in suggestions %}
+    <h3>Related genres like {{inputs[loop.index0]}}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name of Genre</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{row['itemsets']}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
     </div>
 </div>
 {% elif inputs[0] and inputs[1] and inputs[2] and inputs[3] %}
@@ -131,6 +178,25 @@
             <br/>           
         <br/>
     </div>
+    {% for table in suggestions %}
+    <h3>Related genres like {{inputs[loop.index0]}}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name of Genre</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{row['itemsets']}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
 </div>
 {% else %}
 <div class="container">

@@ -36,6 +36,7 @@ def index():
     return render_template('index.html')
 @views.route('/album', methods=['GET', 'POST'])
 def album():
+    print("Loading album page:")
     album,  album_1, album_2, album_3, form = read_input(InputForm)
     if album:
         pass
@@ -43,10 +44,12 @@ def album():
 
 @views.route('/artist', methods=['GET','POST'])
 def artist():
-    print("I LOVE MINECRAFT! Dir: ", os.getcwd())
+    print("Loading artist page Dir: ", os.getcwd())
     artist, artist_1, artist_2, artist_3, form = read_input(InputForm)
     artist_data = None
     artist_image = None
+    artist_top_tracks = []
+    histogram_html = None
     if artist:
         spotify_api = SpotifyAPIFacade("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET")
         mongodb_api = MongoDBFacade("MONGO_CONNECTION_STRING")
@@ -60,7 +63,8 @@ def artist():
         ids = df.loc[df["names"].str.lower() == artist.lower(), "ids"] 
         artist_data = spotify_api.get_artist(ids.iloc[0])
         artist_image = artist_data["images"][0]["url"] if "images" in artist_data and artist_data["images"] else None
-
+        artist_top_tracks.append(spotify_api.get_artist_top_tracks(ids.iloc[0]))
+        #histogram_html = artist_popularity_history(artist_top_tracks)
         # TODO: Write a fail safe for when we cannot find the artist
 
 
@@ -68,7 +72,8 @@ def artist():
                             input = artist,
                             form = form, 
                             output = artist_data,
-                            image_url = artist_image)
+                            image_url = artist_image,
+                            histogram = histogram_html)
 
 @views.route('/genre', methods=['GET', 'POST'])
 def genre():
@@ -80,6 +85,7 @@ def genre():
     genres = [None] * NUMBER_OF_ELEMENTS # Genres the user entered to the website
     genres[0], genres[1], genres[2], genres[3], form = read_input(InputForm)
     genre_data = None
+    timeline_html = None
     
     print(f"Genre 1: {genres[0]}, Genre 2: {genres[1]}, Genre 3: {genres[2]}, Genre 4: {genres[3]}")
 
@@ -111,7 +117,7 @@ def genre():
                             yaxis_title="Count", bargap=0.2)
             
             histogram_html = fig.to_html(full_html=False)
-            timeline_html = genre_popularity_history(genre_match)
+            timeline_html = create_genre_popularity_history_plot(genre_match)
         print(recommendations[0])
 
     return render_template('genre.html', inputs=genres,
@@ -122,6 +128,7 @@ def genre():
 
 @views.route('/track', methods=['GET', 'POST'])
 def track():
+    print("Loading track page")
     track, track_1, track_2, track_3,  form = read_input(InputForm)
     if track:
 
@@ -132,6 +139,7 @@ def track():
 
 @views.route('/about')
 def about():
+    print("Loading about page")
     return render_template('about.html')
 
 def read_input(form_class):
@@ -182,13 +190,13 @@ def apriori_algorithm(genre):
 
     print("Results: ", df_itemset_max_1.head(25))
     
-    return df_itemset_max_1.head(25).to_html(classes="table table-striped", index=False)
+    return df_itemset_max_1.head(20).tail(15).to_dict(index=True, orient="records")
 
 # Find a better data set PLEASE! the one on mongodb DOES NOT HAVE RAP
 # also, k-pop crashes the server, probably because of the - token maybe? 
 # Just go on kraggle and look for one brother 
 # - Jonathan Duggan 2025-03-26
-def genre_popularity_history(genres):
+def create_genre_popularity_history_plot(genres):
     genre_history = mongodb_api.client["music"]
     print("genre popularity history", genres)
     result = genre_history["genre_history"].aggregate([
@@ -216,6 +224,7 @@ def genre_popularity_history(genres):
 
         n = np.arange(len(x))
 
+        # Replace interpld function, it's deprecated 
         x_spline = interp1d(n, x.astype(np.int64), kind="linear")
         y_spline = interp1d(n, y, kind="cubic")
 
@@ -235,4 +244,30 @@ def genre_popularity_history(genres):
         yaxis=dict(showgrid=True),
     )
 
+    return fig.to_html(full_html=False)
+
+def artist_popularity_history(artist_ids):
+    for artist_id in artist_ids:
+        spotify_api.get_artist_album_tracks()
+    spotify_api.get_artist_album_tracks() 
+    comparisons = []
+    for tracks in artists_top_tracks: 
+        track_names_and_pop = list(map(lambda x: {
+            #"release_date" : x["album"]["release_date"],
+            "name" : x["name"],
+            "popularity": x["popularity"]},
+            tracks['tracks']
+        ))
+        track_df = pd.DataFrame(track_names_and_pop)
+        comparisons.append(track_df)
+    
+    df_combined = pd.concat(comparisons)
+    
+    fig = px.histogram(df_combined, x="popularity", color="name", 
+                        barmode="overlay", nbins=100,
+                        title="Popularity Distribution of the Artists Tracks")
+    
+    fig.update_layout(xaxis_title="Popularity",
+                      yaxis_title="Count", bargap=0.2)
+            
     return fig.to_html(full_html=False)

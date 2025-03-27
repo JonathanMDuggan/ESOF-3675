@@ -7,6 +7,9 @@
     {% if image_url %}
         <img src="{{ image_url }}" class="rounded float-left" alt="Artist Image" width="300" height="300">
     {% endif %}
+    <br>
+        <div>{{ histogram | safe }}</div> 
+    <br/>
 </div>
 {% else %}
 <div class="container">

@@ -158,8 +158,8 @@ class SpotifyAPIFacade:
         result = self.json_from_query("albums", QUERY)
         return result['items']
 
-    def get_artist_album_tracks(self, artist_id: str, album_limit=20,
-                                track_limit=20):
+    def get_artist_album_tracks(self, artist_id: str, album_limit=50,
+                                track_limit=50):
         if artist_id == None:
             logging.error("Artist IDs cannot be None")
             return None
