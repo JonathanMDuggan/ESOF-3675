@@ -40,203 +40,218 @@
     <br>
     <h3>Related genres like {{inputs[0]}}</h3>
     <!-- <div>{{ suggestions[0] | safe }}</div>  -->
-</div>
-<table>
-    <thead>
-        <tr>
-            <th>Name of Genre</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in suggestions[0] %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{row['itemsets']}}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-</div>
-<br />
-</div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name of Genre</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in suggestions[0] %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{row['itemsets']}}</td>
+                    <td><a href="https://open.spotify.com/search/genre%3A{{ row['itemsets'] | urlencode }}" target="_blank">Link</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+<br/>
+    </div>
 </div>
 {% elif inputs[0] and inputs[1] and not inputs[2]%}
 {{ form.hidden_tag() }}
 <div class="col-lg-2">
     {{ form.input.label(class="form-label") }}
     <div class="autocomplete">
-    {{ form.input(class="form-label-lg genre-autocomplete", placeholder="Enter Text", value=inputs[0], id="input-field")
-    }}
-</div>
+        {{ form.input(class="form-label-lg genre-autocomplete", placeholder="Enter Text", value=inputs[0],
+        id="input-field")
+        }}
+    </div>
 </div>
 <div class="col-lg-2">
     {{ form.input_comparison_1.label(class="form-label-lg") }}
     <div class="autocomplete">
-    {{ form.input_comparison_1(class="form-label-lg genre-autocomplete", placeholder="Enter Text", value=inputs[1],
-    id="input-field") }}
-</div>
+        {{ form.input_comparison_1(class="form-label-lg genre-autocomplete", placeholder="Enter Text", value=inputs[1],
+        id="input-field") }}
+    </div>
 </div>
 <div class="col-lg-2">
     {{ form.input_comparison_2.label(class="form-label-lg") }}
     <div class="autocomplete">
-    {{ form.input_comparison_2(class="form-label-lg genre-autocomplete", placeholder="Enter Text", id="input-field") }}
-</div>
+        {{ form.input_comparison_2(class="form-label-lg genre-autocomplete", placeholder="Enter Text", id="input-field")
+        }}
+    </div>
 </div>
 <br />
-{{ form.submit(class="btn btn-secondary") }}
-
-</form>
-<br>
-<div>{{ histogram | safe }}</div>
-<br />
-<div>
-    {{timeline | safe}}
-</div>
-</div>
-{% for table in suggestions %}
-<h3>Related genres like {{inputs[loop.index0]}}</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Rank</th>
-            <th>Name of Genre</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in table %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{row['itemsets']}}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endfor %}
-</div>
-</div>
+            {{ form.submit(class="btn btn-secondary") }}
+            
+        </form>
+        <br>
+            <div>{{ histogram | safe }}</div>            
+        <br/>
+        <div>
+            {{timeline | safe}}
+        </div>
+    </div>
+    {% for table in suggestions %}
+    <h3>Related genres like {{ inputs[loop.index0] }}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name of Genre</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row['itemsets'] }}</td>
+                    <td><a href="https://open.spotify.com/search/genre%3A{{ row['itemsets'] | urlencode }}" target="_blank">Link</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+    </div>
+  </div>
 
 {% elif inputs[0] and inputs[1] and inputs[2] and not inputs[3] %}
 {{ form.hidden_tag() }}
 <div class="col-lg-2">
     {{ form.input.label(class="form-label") }}
     <div class="autocomplete">
-    {{ form.input(class="form-label-lg genre-autocomplete", placeholder="Enter Text", value= inputs[0],id="input-field")
-    }}
-</div>
+        {{ form.input(class="form-label-lg genre-autocomplete", placeholder="Enter Text", value=
+        inputs[0],id="input-field")
+        }}
+    </div>
 </div>
 <div class="col-lg-2">
     {{ form.input_comparison_1.label(class="form-label-lg") }}
     <div class="autocomplete">
-    {{ form.input_comparison_1(class="form-label-lg genre-autocomplete", placeholder="Add Comparison", value= inputs[1],
-    id="input-field") }}
-</div>
+        {{ form.input_comparison_1(class="form-label-lg genre-autocomplete", placeholder="Add Comparison", value=
+        inputs[1],
+        id="input-field") }}
+    </div>
 </div>
 <div class="col-lg-2">
     {{ form.input_comparison_2.label(class="form-label-lg") }}
     <div class="autocomplete">
-    {{ form.input_comparison_2(class="form-label-lg genre-autocomplete", placeholder="Add Second Comparison",
-    value=inputs[2], id="input-field") }}
-</div>
+        {{ form.input_comparison_2(class="form-label-lg genre-autocomplete", placeholder="Add Second Comparison",
+        value=inputs[2], id="input-field") }}
+    </div>
 </div>
 <div class="col-lg-2">
     {{ form.input_comparison_3.label(class="form-label-lg") }}
     <div class="autocomplete">
-    {{ form.input_comparison_3(class="form-label-lg genre-autocomplete", placeholder="Add Third Comparison",
-    id="input-field") }}
-</div>
-</div>
-<br />
-{{ form.submit(class="btn btn-secondary") }}
-</form>
-<br>
-<div>{{ histogram | safe }}</div>
-<div>
-    {{timeline | safe}}
+        {{ form.input_comparison_3(class="form-label-lg genre-autocomplete", placeholder="Add Third Comparison",
+        id="input-field") }}
+    </div>
 </div>
 <br />
-<br />
-{% for table in suggestions %}
-<h3>Related genres like {{inputs[loop.index0]}}</h3>
+            {{ form.submit(class="btn btn-secondary") }}
+        </form>
+               <br>
+            <div>{{ histogram | safe }}</div> 
+            <div>
+                {{timeline | safe}}
+            </div>
+            <br/>           
+        <br/>
+    {% for table in suggestions %}
+    <h3>Related genres like {{ inputs[loop.index0] }}</h3>
 <table>
     <thead>
         <tr>
             <th>Rank</th>
             <th>Name of Genre</th>
+            <th>Link</th>
         </tr>
     </thead>
     <tbody>
         {% for row in table %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{row['itemsets']}}</td>
-        </tr>
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ row['itemsets'] }}</td>
+                <td><a href="https://open.spotify.com/search/genre%3A{{ row['itemsets'] | urlencode }}" target="_blank">Link</a></td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>
-{% endfor %}
-</div>
+    {% endfor %}
+    </div>
 </div>
 {% elif inputs[0] and inputs[1] and inputs[2] and inputs[3] %}
 {{ form.hidden_tag() }}
 <div class="col-lg-2">
     {{ form.input.label(class="form-label") }}
     <div class="autocomplete">
-    {{ form.input(class="form-label-lg genre-autocomplete", placeholder="Enter Text", value= inputs[0],id="input-field")
-    }}
-</div>
+        {{ form.input(class="form-label-lg genre-autocomplete", placeholder="Enter Text", value=
+        inputs[0],id="input-field")
+        }}
+    </div>
 </div>
 <div class="col-lg-2">
     {{ form.input_comparison_1.label(class="form-label-lg") }}
     <div class="autocomplete">
-    {{ form.input_comparison_1(class="form-label-lg genre-autocomplete", placeholder="Add Comparison", value= inputs[1],
-    id="input-field") }}
-</div>
+        {{ form.input_comparison_1(class="form-label-lg genre-autocomplete", placeholder="Add Comparison", value=
+        inputs[1],
+        id="input-field") }}
+    </div>
 </div>
 <div class="col-lg-2">
     {{ form.input_comparison_2.label(class="form-label-lg") }}
     <div class="autocomplete">
-    {{ form.input_comparison_2(class="form-label-lg genre-autocomplete", placeholder="Add Second Comparison",
-    value=inputs[2], id="input-field") }}
-</div>
+        {{ form.input_comparison_2(class="form-label-lg genre-autocomplete", placeholder="Add Second Comparison",
+        value=inputs[2], id="input-field") }}
+    </div>
 </div>
 <div class="col-lg-2">
     {{ form.input_comparison_3.label(class="form-label-lg") }}
     <div class="autocomplete">
-    {{ form.input_comparison_3(class="form-label-lg genre-autocomplete", placeholder="Add Third Comparison",
-    value=inputs[3], id="input-field") }}
-</div>
-</div>
-<br />
-
-{{ form.submit(class="btn btn-secondary") }}
-</form>
-<br>
-<div>{{ histogram | safe }}</div>
-<div>
-    {{timeline | safe}}
+        {{ form.input_comparison_3(class="form-label-lg genre-autocomplete", placeholder="Add Third Comparison",
+        value=inputs[3], id="input-field") }}
+    </div>
 </div>
 <br />
-<br />
-</div>
-{% for table in suggestions %}
-<h3>Related genres like {{inputs[loop.index0]}}</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Rank</th>
-            <th>Name of Genre</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in table %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{row['itemsets']}}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endfor %}
+            
+            {{ form.submit(class="btn btn-secondary") }}
+        </form>
+               <br>
+            <div>{{ histogram | safe }}</div> 
+            <div>
+                {{timeline | safe}}
+            </div>
+            <br/>           
+        <br/>
+    </div>
+    {% for table in suggestions %}
+    <h3>Related genres like {{ inputs[loop.index0] }}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name of Genre</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row['itemsets'] }}</td>
+                    <td><a href="https://open.spotify.com/search/genre%3A{{ row['itemsets'] | urlencode }}" target="_blank">Link</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
 </div>
 {% else %}
 <div class="container">
