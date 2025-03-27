@@ -30,7 +30,7 @@ mongodb_api = MongoDBFacade("MONGO_CONNECTION_STRING")
 artist_info_csv = pd.read_csv("temp/CLEANED_featured_Spotify_artist_info.csv")
 
 
-views = Blueprint("views", __name__)    
+views = Blueprint("views", __name__)
 @views.route('/')
 def index():
     return render_template('index.html')
@@ -74,6 +74,40 @@ def artist():
                             output = artist_data,
                             image_url = artist_image,
                             histogram = histogram_html)
+
+
+@views.route("/genre-list", methods=["GET"])
+def genre_data_api():
+    q = request.args.get("q")
+    genre_data = pd.read_csv("temp/CLEANED_featured_Spotify_artist_info.csv")
+    ## get the genre data from the csv file and only the genres column
+    genre_data = genre_data["genres"]
+    genre_data = genre_data.dropna()
+    genre_data = genre_data.str.split(", ")
+    genre_data = genre_data.explode()
+    genre_data = genre_data.value_counts().reset_index()
+
+    # get the genre data from the mongodb database
+    genre_history = mongodb_api.client["music"]
+    result = genre_history["genre_history"].aggregate([
+        {
+            "$match": {
+                "count": {"$gte": 2},
+            }
+        }
+    ])
+
+    genre_history = pd.DataFrame(result)
+    genre_history = genre_history.dropna()
+    genre_history.rename(index={"name": "genres"}, inplace=True)
+
+    genre_data = genre_data[genre_data["genres"].isin(genre_history["name"])]
+    genre_data = genre_data.drop_duplicates(subset="genres", keep="first")
+    # print(genre_data)
+    filtered_df = genre_data[genre_data["genres"].str.contains(q.lower(), case=False, na=False)]
+    res = filtered_df["genres"].head(15).tolist()
+    print(res)
+    return res
 
 @views.route('/genre', methods=['GET', 'POST'])
 def genre():
